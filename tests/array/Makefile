@@ -1,7 +1,9 @@
+PIQI ?= piqi
+
 
 all:
 	$(MAKE) -f Makefile.ocaml
-	piqi convert -t pb test-all.piq
+	$(PIQI) convert -t pb test-all.piq
 	./test
 	cmp test-all.piq.pb test-all.piq.pb.array
 

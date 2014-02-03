@@ -1,7 +1,5 @@
-# this build relies on OCamlMakefile build script, it can be found here:
-#
-#	http://www.ocaml.info/home/ocaml_sources.html#ocaml-make
-#
+OCAMLMAKEFILE := ../../make/OCamlMakefile
+
 
 RESULT = config
 
@@ -11,6 +9,7 @@ SOURCES = \
 	config.ml
 
 
+export OCAMLPATH = ../..
 PACKS = piqirun.ext
 
 
@@ -21,7 +20,7 @@ PIQI_ML_FILES = config_piqi.ml config_piqi_ext.ml
 PRE_TARGETS = $(PIQI_ML_FILES)
 
 
-PIQIC = piqic-ocaml
+PIQIC = ../../piqic-ocaml/piqic-ocaml
 PIQIC_FLAGS = --multi-format --pp #--leave-tmp-files
 
 
@@ -39,4 +38,4 @@ clean::
 	rm -f *.tmp.ml
 
 
-include OCamlMakefile
+include $(OCAMLMAKEFILE)

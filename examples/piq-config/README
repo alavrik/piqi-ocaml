@@ -1,11 +1,7 @@
 This is an example of how to use configuration file in Piq format from OCaml
 program.
 
-This example requires the "piqi.lib" ocamlfind package. Refer to
-../../INSTALL.ocaml for instructions how to build and install it.
-
-To build the example, run "make". Alternatively, you can use the "build.sh"
-script, it contains explicit build commands.
+To build the example, run "make".
 
 The resulting "./config" executable will read the config data structure from
 "config.piq" and print it on stdout.

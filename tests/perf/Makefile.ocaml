@@ -1,4 +1,4 @@
-include $(PIQI_ROOT)/make/Makefile.ocaml
+OCAMLMAKEFILE := ../../make/OCamlMakefile
 
 
 RESULT = test
@@ -9,6 +9,7 @@ SOURCES = \
 	test.ml
 
 
+export OCAMLPATH = ../..
 PACKS = unix piqirun.ext
 
 
@@ -23,7 +24,7 @@ PIQI_ML_FILES = \
 PRE_TARGETS = $(PIQI_ML_FILES)
 
 
-PIQIC = piqic-ocaml
+PIQIC = ../../piqic-ocaml/piqic-ocaml
 PIQIC_FLAGS = --multi-format --pp --no-warnings #--leave-tmp-files
 
 

@@ -1,4 +1,4 @@
-include $(PIQI_ROOT)/make/Makefile.ocaml
+OCAMLMAKEFILE := ../../make/OCamlMakefile
 
 
 RESULT = io_json_xml_pb
@@ -9,6 +9,7 @@ SOURCES = \
 	io_json_xml_pb.ml
 
 
+export OCAMLPATH = ../..
 PACKS = piqirun.ext
 
 
@@ -19,7 +20,7 @@ PIQI_ML_FILES = addressbook_piqi.ml addressbook_piqi_ext.ml
 PRE_TARGETS = $(PIQI_ML_FILES)
 
 
-PIQIC = piqic-ocaml
+PIQIC = ../../piqic-ocaml/piqic-ocaml
 PIQIC_FLAGS = --multi-format --pp #--leave-tmp-files
 
 

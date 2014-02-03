@@ -1,4 +1,5 @@
-include $(PIQI_ROOT)/make/Makefile.ocaml
+OCAMLMAKEFILE := ../../make/OCamlMakefile
+
 
 RESULT = riak_pb
 
@@ -14,14 +15,12 @@ PIQI_FILES = $(PROTO_FILES:%=%.piqi)
 PIQI_ML_FILES = $(PROTO_FILES:%.proto=%_piqi.ml)
 
 
+export OCAMLPATH = ../..
 PACKS = piqirun.pb
 
-# LIBS = piqirun
-# LIBDIRS = $(PIQI_ROOT)/piqirun-ocaml
-# INCDIRS = $(PIQI_ROOT)/piqirun-ocaml
 
-
-PIQIC = piqic-ocaml
+PIQI ?= piqi
+PIQIC = ../../piqic-ocaml/piqic-ocaml
 PIQIC_FLAGS = --pp #--leave-tmp-files
 
 
@@ -41,7 +40,7 @@ $(PIQI_ML_FILES): $(PIQI_FILES)
 $(PIQI_FILES): $(PROTO_FILES)
 	set -e; \
 	for i in $^; do \
-		piqi of-proto $$i ; \
+		$(PIQI) of-proto $$i ; \
 	done
 
 

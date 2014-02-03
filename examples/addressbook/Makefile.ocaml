@@ -1,4 +1,4 @@
-include $(PIQI_ROOT)/make/Makefile.ocaml
+OCAMLMAKEFILE := ../../make/OCamlMakefile
 
 
 SOURCES = addressbook_piqi.ml
@@ -15,13 +15,11 @@ endif
 
 PRE_TARGETS = addressbook_piqi.ml
 
+export OCAMLPATH = ../..
 PACKS = piqirun.pb
 
-# LIBS = piqirun
-# LIBDIRS = $(PIQI_ROOT)/piqirun-ocaml
-# INCDIRS = $(PIQI_ROOT)/piqirun-ocaml
 
-PIQIC = piqic-ocaml
+PIQIC = ../../piqic-ocaml/piqic-ocaml
 PIQIC_FLAGS = --pp #--leave-tmp-files
 
 

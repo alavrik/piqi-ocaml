@@ -1,9 +1,12 @@
+PIQI ?= piqi
+
+
 all: prep test
 
 
 prep:
-	cat ../piqi_misc/piqobj.piqi | sed -e 's!\.module piqi/piqi!.module piqi!' > piqobj.piqi
-	piqi convert --add-defaults -t pb piqi.piqi
+	$(PIQI) cc > piqi.piqi
+	$(PIQI) convert --add-defaults -t pb piqi.piqi
 
 
 test:
@@ -14,5 +17,5 @@ test:
 
 clean:
 	$(MAKE) -f Makefile.ocaml clean
-	rm -f piqobj.piqi piqi.piqi.pb* t.*
+	rm -f piqi.piqi piqi.piqi.pb* t.*
 
