@@ -96,7 +96,7 @@ let gen_builtin_type context piqi_type ocaml_type wire_type =
               ]
 
 
-(* copy-pasted Piqic_erlang_out.gen_alias_type -- not sure how to avoid this *)
+(* copy-pasted Piqic_ocaml_out.gen_alias_type -- not sure how to avoid this *)
 let rec gen_alias_type ?wire_type context a =
   let open A in
   match a.typename with
