@@ -1,6 +1,9 @@
 include make/Makefile.dirs
 
 
+DESTDIR ?= /usr/local
+
+
 DIRS = piqirun piqic-ocaml
 
 
