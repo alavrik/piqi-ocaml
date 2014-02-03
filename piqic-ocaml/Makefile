@@ -1,5 +1,4 @@
-include ../Makefile.config
-include $(PIQI_ROOT)/make/Makefile.ocaml
+OCAMLMAKEFILE := ../make/OCamlMakefile
 
 
 RESULT = piqic-ocaml
@@ -19,7 +18,9 @@ SOURCES = \
 	piqic_ocaml.ml \
 
 
-PACKS = piqilib piqirun.pb
+PACKS = piqilib
+INCDIRS = ../piqirun
+LIBS = ../piqirun/piqirun
 
 
 PRE_TARGETS = piqic_ocaml_version.ml
@@ -35,7 +36,7 @@ clean::
 
 
 # recompile piqi self-spec into piqic_piqi.ml
-PIQI ?= ../src/piqi
+PIQI ?= piqi
 PIQIC = ./$(RESULT)
 PIQIC_FLAGS = -e piqi-ocaml --embed-piqi --pp #--trace
 

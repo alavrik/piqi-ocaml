@@ -1,11 +1,11 @@
-include ../Makefile.config
-include $(PIQI_ROOT)/make/Makefile.ocaml
+OCAMLMAKEFILE := ../make/OCamlMakefile
 
 
 RESULT = piqirun
 
 
-PACKS = piqilib  # piqirun_ext.ml depends on it
+# piqirun_ext.ml depends on it
+PACKS = piqilib
 
 
 SOURCES = \
