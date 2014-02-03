@@ -48,7 +48,58 @@ module P = T.Piqi
 module U = Piqi_util
 
 
-module Iolist = Piqi_iolist
+(* a datastructure for output construction *)
+module Iolist =
+  struct
+    type iolist =
+        Ios of string
+      | Iol of iolist list
+      | Iob of char
+      | Eol
+
+    (* iolist construction *)
+    let (^^) a b =
+      match a, b with
+        | Ios _, Iol b -> Iol (a::b)
+        | Ios " ", Eol -> Eol
+        | _, _ -> Iol [a;b]
+
+    let eol = Eol
+    let ios x = Ios x
+    let iol l = Iol l
+    let iob b = Iob b
+
+    let iod delim = function  (* iol with elements separated by delim *)
+      | [] -> Iol []
+      | h::t ->
+        let d = ios delim in
+        List.fold_left (fun accu x -> accu ^^ d ^^ x) h t
+
+    let ioq x = (* double-quoted string *)
+      iol [ios "\""; ios x; ios "\""]
+
+    (* iolist output *)
+    let to_buffer0 buf l =
+      let rec aux = function
+        | Eol -> Buffer.add_char buf '\n';
+        | Ios s -> Buffer.add_string buf s
+        | Iol l -> List.iter aux l
+        | Iob b -> Buffer.add_char buf b
+      in aux l
+
+    let to_buffer l =
+      let buf = Buffer.create 4096 in
+      to_buffer0 buf l;
+      buf
+
+    let to_string l =
+      let buf = to_buffer l in
+      Buffer.contents buf
+
+    let to_channel ch l =
+      let buf = to_buffer l in
+      Buffer.output_buffer ch buf
+  end
 open Iolist
 
 
