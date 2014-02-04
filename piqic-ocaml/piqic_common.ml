@@ -504,7 +504,7 @@ let is_self_spec piqi =
   then true
   else
     let basename = U.get_local_name (some_of piqi.P.modname) in
-    U.string_startswith basename "piqi."
+    U.string_startswith basename "piqi." || basename = "piqi"
 
 
 (* check whether the piqi module depends on "piqi-any" type (i.e. one of its
