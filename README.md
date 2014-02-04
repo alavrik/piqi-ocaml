@@ -1,6 +1,4 @@
-<!-- [![Build
-Status](https://travis-ci.org/alavrik/piqi-ocaml.png)](https://travis-ci.org/alavrik/piqi-ocaml)
--->
+[![Build Status](https://travis-ci.org/alavrik/piqi-ocaml.png)](https://travis-ci.org/alavrik/piqi-ocaml)
 
 
 Piqi is a multi-format data serialization system for OCaml. It provides a
@@ -72,8 +70,7 @@ This command will install the latest stable version of Piqi that includes `piqi`
 and `piqic-ocaml` executables and runtime libraries for OCaml.
 
 To install the latest development version of Piqi, follow the instructions at
-
-    https://github.com/piqi/piqi-opam-repo
+https://github.com/piqi/piqi-opam-repo
 
 
 ### Installing from source code
@@ -83,16 +80,16 @@ To install the latest development version of Piqi, follow the instructions at
 
   Follow general build and installation instructions from the INSTALL file.
 
-  After that, build and install the piqilib OCaml library by running
+  After that, build and install the `piqilib` OCaml library by running
 
       make ocaml
       make ocaml-install
 
 
-2. Build and install piqi-ocaml
+2. Build and install `piqi-ocaml`
 
-    make
-    make install
+      make
+      make install
 
 
 To uninstall:
