@@ -45,7 +45,164 @@ module L = T.Piqi_list
 module P = T.Piqi
 
 
-module U = Piqi_util
+(* utils *)
+module Utils =
+  struct
+    (* substitute character [x] with [y] in string [s] *)
+    let string_subst_char s x y =
+      if not (String.contains s x)
+      then s
+      else
+        (* preserve the original string *)
+        let s = String.copy s in
+        for i = 0 to (String.length s) - 1
+        do
+          if s.[i] = x
+          then s.[i] <- y
+        done; s
+
+
+    let dashes_to_underscores s =
+      string_subst_char s '-' '_'
+
+
+    let list_of_string s =
+      let n = String.length s in
+      let rec aux i =
+        if i < n
+        then s.[i] :: (aux (i+1))
+        else []
+      in aux 0
+
+
+    let string_of_list l =
+      let s = String.create (List.length l) in
+      let rec aux i = function
+        | [] -> ()
+        | h::t ->
+            s.[i] <- h; aux (i+1) t
+      in
+      aux 0 l; s
+
+
+    let string_startswith s prefix =
+      let len = String.length prefix in
+      let rec aux i =
+        if i = len
+        then true
+        else
+          if s.[i] <> prefix.[i]
+          then false
+          else aux (i+1)
+      in
+      try
+        aux 0
+      with _ ->
+        false
+
+
+    (* list flatmap *)
+    let flatmap f l =
+      List.concat (List.map f l)
+
+
+    (* NOTE: naive, non-tail recursive. Remove duplicates from the list using
+     * reference equality, preserves the initial order *)
+    let rec uniqq = function
+      | [] -> []
+      | h::t ->
+          let t = uniqq t in
+          if List.memq h t then t else h :: t
+
+
+    (* leave the first of the duplicate elements in the list instead of the last *)
+    let uniqq l =
+      List.rev (uniqq (List.rev l))
+
+
+    let rec uniq = function
+      | [] -> []
+      | h::t ->
+          let t = uniq t in
+          if List.mem h t then t else h :: t
+
+
+    (* leave the first of the duplicate elements in the list instead of the last *)
+    let uniq l =
+      List.rev (uniq (List.rev l))
+
+
+    (* analogous to Filename.dirname but with forward slashes only *)
+    let get_module_name x =
+      try
+        let pos = String.rindex x '/' in
+        let res = String.sub x 0 pos in
+        Some res
+      with
+        Not_found -> None
+
+
+    (* analogous to Filename.basename but with forward slashes only *)
+    let get_local_name x =
+      try
+        let pos = String.rindex x '/' in
+        String.sub x (pos + 1) ((String.length x) - pos - 1)
+      with
+        Not_found -> x
+
+
+    let is_scoped_name name = String.contains name '/'
+
+
+    let split_name x =
+      get_module_name x, get_local_name x
+
+
+    let normalize_list l =
+      let isupper c = (c >= 'A' && c <= 'Z') in
+      let tolower c =  Char.chr (Char.code c + 32) in
+      let rec aux hump accu = function
+        | [] -> List.rev accu
+        | h::t when h = '_' || h = '-' ->
+            aux true ('-'::accu) t
+        | h::t when isupper h && not hump -> (* first hump character *)
+            aux true ((tolower h)::'-'::accu) t
+        | h::t when isupper h && hump -> (* another hump character *)
+            aux hump ((tolower h)::accu) t
+        | h::t when h = '.' || h = ':' || h = '/' ->
+            aux true (h::accu) t
+        | h::t -> (* end of hump *)
+            aux false (h::accu) t
+      in
+      match l with
+        | [] -> []
+        | h::_ -> aux (isupper h) [] l
+
+
+    (* check if the name is normal, i.e. no uppercase characters and no hyphens *)
+    let is_normal_name s =
+      let len = String.length s in
+      let rec aux i =
+        if i = len
+        then true (* the name is normal *)
+        else
+          match s.[i] with
+            | 'A'..'Z' | '_' -> false
+            | _ -> aux (i+1)
+      in
+      aux 0
+
+
+    (* convert an arbitary valid name to lowercase name which words are separated by
+     * dashes; for example "CamelCase" will become "camel-case"; already lowercased
+     * names will remain intact *)
+    let normalize_name s =
+      if is_normal_name s
+      then s
+      else string_of_list (normalize_list (list_of_string s))
+  end
+
+module U = Utils
 
 
 (* a datastructure for output construction *)
@@ -193,7 +350,7 @@ let flag_gen_preserve_unknown_fields = ref false
 let ocaml_name n =
   let n =
     if !flag_normalize_names
-    then Piqi_name.normalize_name n
+    then U.normalize_name n
     else n
   in
   U.dashes_to_underscores n
@@ -307,7 +464,7 @@ let mlname_piqi (piqi:T.piqi) =
     else
       (* NOTE: modname is always defined in "piqi compile" output *)
       let modname = some_of piqi.modname in
-      let n = Piqi_name.get_local_name modname in (* strip module path *)
+      let n = U.get_local_name modname in (* strip module path *)
       Some (ocaml_ucname n ^ "_piqi")
   in
   {
@@ -346,12 +503,8 @@ let is_self_spec piqi =
   if !flag_cc
   then true
   else
-    let basename = Piqi_name.get_local_name (some_of piqi.P.modname) in
-    match U.string_split basename '.' with
-      | "piqi"::_ ->
-          true
-      | _ ->
-          false
+    let basename = U.get_local_name (some_of piqi.P.modname) in
+    U.string_startswith basename "piqi."
 
 
 (* check whether the piqi module depends on "piqi-any" type (i.e. one of its
@@ -563,7 +716,7 @@ let resolve_local_typename ?import index name =
  * and the import its module was imported with *)
 let resolve_typename context typename =
   let index = context.index in
-  match Piqi_name.split_name typename with
+  match U.split_name typename with
     | None, name ->  (* local type *)
         (* NOTE: this will also resolve built-in types *)
         resolve_local_typename index name
