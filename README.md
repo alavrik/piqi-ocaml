@@ -88,9 +88,10 @@ https://github.com/piqi/piqi-opam-repo
 
 2. Build and install `piqi-ocaml`
 
-      make
-      make install
-
+  ```
+  make
+  make install
+  ```
 
 To uninstall:
 
