@@ -8,6 +8,7 @@ DIRS = \
        packed \
        array \
        misc \
+       misc1 \
        custom-types \
        piq-config \
 
