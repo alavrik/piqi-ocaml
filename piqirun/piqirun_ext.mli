@@ -30,7 +30,7 @@ type piqi_type
 type options
 
 
-val init_piqi : string list -> unit
+val init_piqi : string -> unit
 
 val find_piqi_type : string -> piqi_type
 

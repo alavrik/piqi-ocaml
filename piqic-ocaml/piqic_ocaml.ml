@@ -123,10 +123,10 @@ let gen_output_file ofile code =
 (* build a list of all import dependencies including the specified module and
  * encode each Piqi module in the list using Protobuf encoding *)
 let gen_embedded_piqi piqi_list =
-  let l = List.map (fun x -> Piqirun.to_string (T.gen_piqi x)) piqi_list in
-  let l = List.map (fun s -> ioq (String.escaped s)) l in
+  let piqi = List.hd (List.rev piqi_list) in
+  let s = Piqirun.to_string (T.gen_piqi piqi) in
   iol [
-    ios "let piqi = ["; iod ";" l; ios "]"
+    ios "let piqi = "; ioq (String.escaped s)
   ]
 
 
@@ -237,7 +237,7 @@ let speclist = Piqi_command.common_speclist @
 
 let usage = "\
 Usage: piqic-ocaml [options] <.piqi file>
-       piqic-ocaml [--version | --Piqi-version]
+       piqic-ocaml [--version | --piqi-version]
 
 Options:"
 

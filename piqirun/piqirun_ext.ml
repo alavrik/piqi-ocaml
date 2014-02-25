@@ -43,11 +43,11 @@ let add_piqi (piqi_bin: string) =
 
 let seen = ref []
 
-let init_piqi piqi_list =
-  if not (List.memq piqi_list !seen)
+let init_piqi piqi =
+  if not (List.memq piqi !seen)
   then (
-    seen:= piqi_list :: !seen;
-    List.iter add_piqi piqi_list
+    seen:= piqi :: !seen;
+    add_piqi piqi
   )
 
 
