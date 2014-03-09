@@ -527,7 +527,7 @@ let depends_on_piqi_any (piqi: T.piqi) =
 
 
 let load_self_spec () =
-  let self_spec_bin = List.hd T.piqi in
+  let self_spec_bin = T.piqi in
   let buf = Piqirun.init_from_string self_spec_bin in
   T.parse_piqi buf
 
