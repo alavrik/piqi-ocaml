@@ -14,7 +14,7 @@ PACKS = piqirun.ext
 
 PIQI ?= piqi
 PIQIC = ../../piqic-ocaml/piqic-ocaml
-PIQIC_FLAGS = --ext --pp #--leave-tmp-files
+PIQIC_FLAGS = --ext --pp #--keep-tmp-files
 
 
 all: native-code test #byte-code

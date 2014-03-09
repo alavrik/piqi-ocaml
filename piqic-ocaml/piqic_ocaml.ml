@@ -28,7 +28,6 @@ open Iolist
 let flag_pp = ref false
 let flag_gen_defaults = ref false  (* deprecated -- always enabled by default *)
 let flag_embed_piqi = ref false
-let flag_strict = ref false
 let flag_multi_format = ref false
 let flag_runtime = ref ""
 let flag_version = ref false
@@ -78,13 +77,6 @@ let arg__version =
 let arg__piqi_version =
   "--piqi-version", Arg.Set flag_piqi_version,
     "print piqi version and exit"
-
-let arg__strict =
-  let (name, _setter, descr) = Piqi_command.arg__strict in
-  (* override the original setter but keep the option name and the description;
-   * we do this, because although it means the same, it is applied at a later
-   * stage -- we control it manually below *)
-  (name, Arg.Set flag_strict, descr)
 
 
 let ocaml_pretty_print ifile ofile =
@@ -180,23 +172,13 @@ let piqic context =
   then gen_piqi_ext_ml context
 
 
-let load_self_spec () =
-  let self_spec_bin = List.hd T.piqi in
-  let buf = Piqi_piqirun.init_from_string self_spec_bin in
-  Piqi_compile.load_self_spec buf
-
-
 (* this is the same as calling "piqi compile ..." and reading its output but,
  * instead, we are just using the library functions *)
 let piqi_compile_piqi ifile =
-  let self_spec = load_self_spec () in
-
-  (* tell the library to automatically load *.ocaml.piqi extension modules *)
-  Piqi_config.add_include_extension "ocaml";
-
-  let ch = Piqi_command.open_input ifile in
-  let piqi = Piqi.load_piqi ifile ch in
-  Piqi_compile.compile self_spec piqi ~strict:!flag_strict
+  let self_spec_bin = List.hd T.piqi in
+  (* by adding "ocaml" extension, we tell the library to automatically load
+   * *.ocaml.piqi extension modules *)
+  Piqi_compile.compile self_spec_bin ifile ~extensions:["ocaml"]
 
 
 let load_piqi_list ifile =
@@ -215,16 +197,14 @@ let piqic_file ifile =
   piqic context
 
 
-let speclist = Piqi_command.common_speclist @
+let speclist = Piqi_compile.getopt_speclist @
   [
     Piqi_command.arg_C;
-    arg__strict;
-    Piqi_command.arg__include_extension;  (* -e *)
     arg__normalize_names;
     arg__pp;
     arg__gen_defaults;
     arg__gen_preserve_unknown_fields;
-    Piqi_command.arg__leave_tmp_files;
+    Piqi_command.arg__keep_tmp_files;
     arg__embed_piqi;
     arg__multi_format;
     arg__ext;
