@@ -90,11 +90,11 @@ let gen_gen modname typedef =
 let gen_print typedef =
   let name = C.typedef_mlname typedef in
   iod " " [
-    ios "let print_" ^^ ios name; ios "x =";
-      ios "Pervasives.print_endline (gen_" ^^ ios name; ios "x `piq)";
+    ios "let print_" ^^ ios name; ios "?opts x =";
+      ios "Pervasives.print_endline (gen_" ^^ ios name; ios "x `piq ?opts)";
     eol;
-    ios "let prerr_" ^^ ios name; ios "x =";
-      ios "Pervasives.prerr_endline (gen_" ^^ ios name; ios "x `piq)";
+    ios "let prerr_" ^^ ios name; ios "?opts x =";
+      ios "Pervasives.prerr_endline (gen_" ^^ ios name; ios "x `piq ?opts)";
     eol;
   ]
 
