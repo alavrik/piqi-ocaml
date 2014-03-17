@@ -47,9 +47,9 @@ let gen_typedef_type ?import context typedef =
 (* XXX: check type compatibility *)
 let rec gen_type context typename = 
   let import, parent_piqi, typedef = C.resolve_typename context typename in
+  let context = C.switch_context context parent_piqi in
   match typedef with
     | `alias a ->
-        let context = C.switch_context context parent_piqi in
         let ocaml_name = some_of a.A.ocaml_name in
         (* skip cyclic type abbreviations *)
         let ocaml_type = gen_alias_type context a in

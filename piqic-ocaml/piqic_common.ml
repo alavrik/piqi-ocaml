@@ -742,13 +742,16 @@ let rec unalias context typedef :(T.piqi * resolved_type) =
         context.piqi, (typedef :> resolved_type)
 
 
+let type_mlname context typename =
+  let import, parent_piqi, typedef = resolve_typename context typename in
+  typedef_mlname typedef
+
 
 let mlname_of context ocaml_name typename =
   match ocaml_name, typename with
     | Some n, _ -> n
     | None, Some typename  ->
-        let import, parent_piqi, typedef = resolve_typename context typename in
-        typedef_mlname typedef
+        type_mlname context typename
     | _ ->
         assert false
 
@@ -789,8 +792,7 @@ let can_be_protobuf_packed context typedef =
 let gen_convert_value context ocaml_type direction typename value =
   match typename, ocaml_type with
     | Some typename, Some ocaml_type -> (* custom OCaml type *)
-        let import, parent_piqi, typedef = resolve_typename context typename in
-        let name = typedef_mlname typedef in
+        let name = type_mlname context typename in
         iol [
           ios "(";
             ios ocaml_type;
