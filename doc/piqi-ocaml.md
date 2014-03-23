@@ -483,7 +483,7 @@ After that, the only thing that's left is to compile and link
 `piqirun_custom.ml` with your OCaml program.
 
 More examples of how to map various OCaml types to Piqi types can be found
-[here](http://github.com/alavrik/piqi-ocaml/tree/master/examples/ocaml-custom-types/).
+[here](http://github.com/alavrik/piqi-ocaml/tree/master/examples/custom-types/).
 
 ### Piqi extensions
 
@@ -501,7 +501,7 @@ Examples
     [examples](http://protobuf.googlecode.com/svn/trunk/examples/) written in
     C++, Java and Python.
 
-    [examples/ocaml](http://github.com/alavrik/piqi-ocaml/tree/master/examples/ocaml/)
+    [examples/ocaml](http://github.com/alavrik/piqi-ocaml/tree/master/examples/)
 
 -   Data serialization in XML, JSON and Piq formats using `piqic-ocaml
     --multi-format`
@@ -530,11 +530,11 @@ Examples
 
 -   Examples of serializing custom OCaml types using Piqi
 
-    [examples/ocaml-custom-types](http://github.com/alavrik/piqi-ocaml/tree/master/examples/ocaml-custom-types/)
+    [examples/ocaml-custom-types](http://github.com/alavrik/piqi-ocaml/tree/master/examples/custom-types/)
 
 -   Example of using [Piq](/doc/piq) as a config file format
 
-    [examples/ocaml-piq-config](http://github.com/alavrik/piqi-ocaml/tree/master/examples/ocaml-piq-config/)
+    [examples/ocaml-piq-config](http://github.com/alavrik/piqi-ocaml/tree/master/examples/piq-config/)
 
 Limitations
 -----------
