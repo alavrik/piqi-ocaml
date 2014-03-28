@@ -99,6 +99,26 @@ let gen_print typedef =
   ]
 
 
+(* NOTE: the only purpose of this is to make sure that all the dependencies are
+ * going to be linked in. Otherwise, Piqi modules can end up being missing and
+ * uninitialized. This, in turn, leads to crash on multi-format serialization of
+ * nested types from imported modules *)
+let gen_import context import =
+  let open Import in
+  let index = C.resolve_import context import in
+  let piqi = index.i_piqi in
+  iod " " [
+    ios "module"; ios (some_of import.ocaml_name) ^^ ios "_ext"; ios "=";
+        ios (some_of piqi.P.ocaml_module) ^^ ios "_ext";
+    eol;
+  ]
+
+
+let gen_imports context l =
+  let l = List.map (gen_import context) l in
+  iol l
+
+
 let gen_piqi context =
   let piqi = context.piqi in
   let modname = some_of piqi.P.ocaml_module in
@@ -115,6 +135,7 @@ let gen_piqi context =
   let printers = List.map gen_print typedefs in
 
   iol [
+    gen_imports context piqi.P.import;
     gen_init_piqi modname; eol; eol;
     iol type_initializers; eol; eol;
     iol parsers; eol; eol;
