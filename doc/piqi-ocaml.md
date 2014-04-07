@@ -192,23 +192,50 @@ For example:
 
 `piqic-ocaml` accepts the following command-line parameters.
 
+-   `--multi-format` generate extended OCaml stubs for multi-format
+    (JSON/XML/Piq/Pb) serialization, i.e. `<module>_piqi_ext.ml`a file
+
+-   `--ext` same as `--multi-format`
+
 -   `--normalize true|false` -- convert "CamelCase"-style identifiers from the
     original type spec into "camel-case" OCaml names (names will be capitalized
     when appropriate). When the argument is `false`, the original identifiers
     will be lowercased without performing any additional transformations, e.g.
     "CamelCase" turns into "camelCase". The default value is `true`.
 
+-   `--runtime <module>` name of the Protobuf serialization runtime module
+    (default = Piqirun)
+
 -   `-C <dir>` -- specify output directory for the generated `.ml` files.
+
+-   `-I <dir>` -- add directory to the list of imported .piqi search paths
+
+-   `-e <name>` -- try including extension <name> for all loaded modules (can be
+    used several times)
+
+-   `--gen-preserve-unknown-fields` -- generate code that preserves unknown
+    Protobuf fields when they are serialized back. When enabled, unknown
+    (unrecognized) Protobuf fields are captured during de-serialization in a
+    special 'piqi_unknown_pb' field and automatically written back when the
+    record is serialized to Protobuf.
 
 -   `--pp` -- pretty-print output `.ml` files using CamlP4 (camlp4o).
 
--   `--leave-tmp-files` -- don't delete temporary files created during command
+-   `--keep-tmp-files` -- don't delete temporary files created during command
     execution. This flag is helpful for debugging `piqic-ocaml` in case it
     generates an invalid OCaml code.
 
-There are some other common command-line parameters that are not specific to
-`piqic-ocaml`. They are documented in the [Piqi command-line tools](/doc/tools/)
-section.
+-   `--strict` treat unknown and duplicate fields as errors
+
+-   `--no-warnings` -- don't print warnings
+
+-   `--trace` -- turn on tracing (verbose output)
+
+-   `--version` -- print piqi-ocaml version and exit
+
+-   `--piqi-version` -- print piqi (piqilib) version and exit
+
+-   `-h, --help`  -- print command-line options help
 
 
 Piqi to OCaml mapping
