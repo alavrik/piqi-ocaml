@@ -196,11 +196,12 @@ For example:
 
 -   `--ext` same as `--multi-format`
 
--   `--normalize true|false` -- convert "CamelCase"-style identifiers from the
-    original type spec into "camel-case" OCaml names (names will be capitalized
-    when appropriate). When the argument is `false`, the original identifiers
-    will be lowercased without performing any additional transformations, e.g.
-    "CamelCase" turns into "camelCase". The default value is `true`.
+-   `--normalize-names true|false` -- convert "CamelCase"-style identifiers from
+    the original type spec into "camel_case" OCaml names (names will be
+    capitalized when appropriate). When the argument is `false`, the original
+    identifiers will be lowercased without performing any additional
+    transformations, e.g. "CamelCase" turns into "camelCase". The default value
+    is `true`.
 
 -   `--runtime <module>` name of the Protobuf serialization runtime module
     (default = Piqirun)

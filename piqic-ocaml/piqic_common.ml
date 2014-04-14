@@ -401,7 +401,7 @@ let gen_pvar_name name =
  *)
 
 (* command-line flags *)
-let flag_normalize_names = ref false
+let flag_normalize_names = ref true
 let flag_cc = ref false
 let flag_gen_preserve_unknown_fields = ref false
 

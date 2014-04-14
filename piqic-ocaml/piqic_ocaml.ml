@@ -40,7 +40,7 @@ let arg__pp =
 
 let arg__normalize_names =
   "--normalize-names", Arg.Bool (fun x -> C.flag_normalize_names := x),
-    "true|false turn CamlCase-style names into \"camel-case\" (default = true)"
+    "true|false turn CamlCase-style names into \"camel_case\" (default = true)"
 
 let arg__gen_defaults =
   "--gen-defaults", Arg.Set flag_gen_defaults,
