@@ -96,15 +96,13 @@ let gen_field_type context f =
 
 let gen_field context f = 
   let open F in
-  let fdef = iod " " (* field definition *)
-    [
-      ios "mutable"; (* defining all fields as mutable at the moment *)
-      ios (C.mlname_of_field context f);
-      ios ":";
-      gen_field_type context f;
-      ios ";";
-    ]
-  in fdef
+  iol [
+    ios "mutable ";  (* NOTE: defining all fields as mutable at the moment *)
+    ios (C.mlname_of_field context f);
+    ios ": ";
+    gen_field_type context f;
+    ios ";"
+  ]
 
 
 (* generate record type in record module; see also gen_record' *)
@@ -121,20 +119,20 @@ let gen_record_mod context r =
     then fdefs @ [ios "piqi_unknown_pb: (int * Piqirun.t) list;"]
     else fdefs
   in
-  let rcons = (* record def constructor *)
-    iol [ios "type t = "; ios "{"; iol fdefs; ios "}"]
-  in
-  let rdef = iod " "
-    [
-      ios modname; (* module declaration *)
-      ios ":";
-        ios "sig"; (* signature *) 
-        rcons;
-        ios "end";
-      ios "=";
-        ios modname;
+  (* record def constructor *)
+  let rcons = [
+    ios "type t = "; ios "{";
+    ioi (newlines fdefs);
+    ios "}";
+  ]
+  in iol [
+    ios modname; ios ":";
+    ioi [
+      ios "sig";
+      ioi rcons;
+      ios "end"; ios " = "; ios modname;
     ]
-  in rdef
+  ]
 
 
 let gen_option context o =
@@ -194,17 +192,18 @@ let gen_list context l =
 
 
 let gen_options context options =
-  let var_defs =
-    iod "|" (List.map (gen_option context) options)
-  in
-  iol [ios "["; var_defs; ios "]"]
+  let options_code = List.map (gen_option context) options in
+  ioi [
+    ios "[";
+    ioi (prefix "| " options_code |> newlines);
+    ios "]"
+  ]
 
 
 let gen_variant context v =
   let open Variant in
   iol [
-    ios (some_of v.ocaml_name);
-    ios " = ";
+    ios (some_of v.ocaml_name); ios " =";
     gen_options context v.option;
   ]
 
@@ -212,8 +211,7 @@ let gen_variant context v =
 let gen_enum context e =
   let open Enum in
   iol [
-    ios (some_of e.ocaml_name);
-    ios " = ";
+    ios (some_of e.ocaml_name); ios " =";
     gen_options context e.option;
   ]
 
@@ -244,33 +242,25 @@ let gen_mod_typedef context typedef =
 let gen_typedefs context (typedefs:T.typedef list) =
   let top_modname = C.top_modname context in
   (* generated typedefs that must be wrapped into ocaml modules *)
-  let mod_defs = U.flatmap (gen_mod_typedef context) typedefs in
-  (* generated the rest of typedefs *)
+  let def_mods = U.flatmap (gen_mod_typedef context) typedefs in
+  (* generated the rest of typedefs wrapped into into an ocaml module *)
   let other_defs = U.flatmap (gen_typedef context) typedefs in
-  let other_defs_mod = iod " "
-    [
-      ios top_modname; (* module declaration *)
-      ios ":";
-        ios "sig";  (* signature *) 
-
-        if other_defs = []
-        then iol []
-        else iol [
-          ios "type ";
-          iod " type " other_defs;
-        ];
-
-        ios "end";
-      ios "="; ios top_modname;
+  let top_mod = iol [
+    ios top_modname;
+    ios ":";
+    ioi [
+      ios "sig";
+      ioi (prefix "type " other_defs |> newlines);
+      ios "end"; ios " = "; ios top_modname;
     ]
-  in
-  let modules = [other_defs_mod] @ mod_defs in
-  let code = iol [
-    ios "module rec ";
-    iod " and " modules;
   ]
   in
-  iod " " [
+  let code = iol [
+    ios "module rec "; top_mod;
+    iol (prefix "and " def_mods);
+  ]
+  in
+  iol [
     code;
     eol;
   ]
@@ -281,9 +271,9 @@ let gen_import context import =
   let index = C.resolve_import context import in
   let piqi = index.i_piqi in
   iod " " [
-    ios "module"; ios (some_of import.ocaml_name); ios "=";
+    ios "module "; ios (some_of import.ocaml_name); ios "=";
         ios (some_of piqi.P.ocaml_module);
-    eol;
+    eol; eol
   ]
 
 
@@ -423,5 +413,6 @@ let gen_piqi context =
   iol [
     gen_imports context piqi.P.import;
     gen_typedefs context typedefs;
+    eol; eol
   ]
 

@@ -93,7 +93,7 @@ let gen_field_cons context rname f =
     iol [ios rname; ios "."; ios fname]
   in 
   (* field construction code *)
-  iod " " [ ffname; ios "="; esc fname; ios ";" ]
+  iol [ ffname; ios " = "; esc fname; ios ";" ]
 
 
 let gen_field_parser context f =
@@ -118,19 +118,19 @@ let gen_field_parser context f =
             then gen_type context typename
             else iol [];
 
-            ios " x";
+            ios "x";
             gen_default f.default;
         ]
     | None ->
         (* flag constructor *)
         iod " " [ 
           gen_cc "incr_count_if_true (";
-            ios "Piqirun.parse_flag"; code; ios " x";
+            ios "Piqirun.parse_flag"; code; ios "x";
           gen_cc ")";
         ]
   in
   (* field parsing code *)
-  iol [ ios "let "; esc fname; ios ", x = "; fcons; ios " in " ]
+  iol [ ios "let "; esc fname; ios ", x = "; fcons; ios " in"; eol ]
 
 
 let gen_record context r =
@@ -154,15 +154,20 @@ let gen_record context r =
   let rcons = (* record constructor *)
     iol [
       iol fparserl;
-      ios "Piqirun.check_unparsed_fields x; {"; iol fconsl; ios "}";
+      ios "Piqirun.check_unparsed_fields x;"; eol;
+      ios "{";
+      ioi (newlines fconsl);
+      ios "}";
     ]
   in (* parse_<record-name> function delcaration *)
-  iod " " [
-    ios "parse_" ^^ ios (some_of r.R.ocaml_name); ios "x =";
-    ios "let x = Piqirun.parse_record x in";
-    gen_cc "let count = next_count() in refer count (";
-    rcons;
-    gen_cc ")";
+  iol [
+    ios "parse_"; ios (some_of r.R.ocaml_name); ios " x =";
+    ioi [
+      ios "let x = Piqirun.parse_record x in"; eol;
+      gen_cc "let count = next_count() in refer count (\n";
+      rcons;
+      gen_cc ")\n";
+    ]
   ]
 
 
@@ -177,21 +182,26 @@ let gen_enum e ~is_packed =
   let consts = List.map gen_const e.option in
   let packed_prefix = C.gen_packed_prefix is_packed in
   iol [
-    packed_prefix; ios "parse_"; ios (some_of e.ocaml_name); ios " x = ";
-    gen_cc "let count = next_count() in refer count (";
-      ios "match Piqirun.int32_of_"; packed_prefix; ios "signed_varint x with ";
-      iol consts;
-      ios "| x -> Piqirun.error_enum_const x";
-    gen_cc ")";
+    packed_prefix; ios "parse_"; ios (some_of e.ocaml_name); ios " x =";
+    ioi [
+      gen_cc "let count = next_count() in refer count (";
+        ios "match Piqirun.int32_of_"; packed_prefix; ios "signed_varint x with";
+        ioi [
+          iol (newlines consts);
+          ios "| x -> Piqirun.error_enum_const x";
+        ];
+      gen_cc ")\n";
+    ]
   ]
 
 
 let gen_enum e =
   (* generate two functions: one for parsing normal value; another one -- for
    * packed value *)
-  iod " and " [
-    gen_enum e ~is_packed:false;
-    gen_enum e ~is_packed:true;
+  iol [
+    gen_enum e ~is_packed:false; eol;
+    ios "and ";
+    gen_enum e ~is_packed:true
   ]
 
 
@@ -201,10 +211,10 @@ let gen_option context varname o =
   let code = C.gen_code o.code in
   match o.typename with
     | None ->  (* this is a flag, i.e. option without a type *)
-        iod " " [
-          ios "|"; code; ios "when x = Piqirun.Varint 1"; ios "->";
+        iol [
+          ios "| "; code; ios " when x = Piqirun.Varint 1 -> ";
             (* NOTE: providing special handling for boxed values, see "refer" *)
-            gen_cc "let count = next_count() in refer count";
+            gen_cc "let count = next_count() in refer count ";
             C.gen_pvar_name name;
         ]
     | Some typename ->
@@ -214,19 +224,21 @@ let gen_option context varname o =
               (* handle variant and enum subtyping cases by lifting their labels
                * and clauses to the top level -- in fact, relying on OCaml here
                * by using #<included variant or enum type> construct *)
-              iod " " [
-                ios "|"; code; ios "->";
-                  ios "("; gen_type context typename; ios "x :>"; ios varname; ios ")"
+              iol [
+                ios "| "; code; ios " -> ";
+                  ios "("; gen_type context typename; ios " x :> "; ios varname; ios ")"
               ]
           | _ ->
-              iod " " [
-                ios "|"; code; ios "->";
+              iol [
+                ios "| "; code; ios " ->";
+                indent (ioi [
                   ios "let res = ";
                     gen_cc "let count = curr_count() in refer count (";
-                    gen_type context typename; ios "x";
+                    gen_type context typename; ios " x";
                     gen_cc ")";
-                    ios "in";
-                    C.gen_pvar_name name; ios "res";
+                    ios " in"; eol;
+                    C.gen_pvar_name name; ios " res";
+                ])
               ]
 
 
@@ -235,14 +247,18 @@ let gen_variant context v =
   let name = some_of v.ocaml_name in
   let scoped_name = C.scoped_name context name in
   let options = List.map (gen_option context scoped_name) v.option in
-  iod " " [
-    ios "parse_" ^^ ios name; ios "x =";
-    ios "let code, x = Piqirun.parse_variant x in";
-      gen_cc "let count = next_count() in refer count (";
+  iol [
+    ios "parse_"; ios name; ios " x =";
+    ioi [
+      ios "let code, x = Piqirun.parse_variant x in"; eol;
+      gen_cc "let count = next_count() in refer count (\n";
       ios "match code with";
-        iod " " options;
+      ioi [
+        iol (newlines options);
         ios "| _ -> Piqirun.error_variant x code";
-        gen_cc ")";
+      ];
+      gen_cc ")\n";
+    ]
   ]
 
 
@@ -267,9 +283,10 @@ let gen_alias context a =
     (* if a value can be packed, we need to generate two functions: one for
      * parsing regular (unpacked) representation, and another one for
      * parsing packed form *)
-    iod " and " [
-      gen_alias context a ~is_packed:false;
-      gen_alias context a ~is_packed:true;
+    iol [
+      gen_alias context a ~is_packed:false; eol;
+      ios "and ";
+      gen_alias context a ~is_packed:true
     ]
   else
     gen_alias context a ~is_packed:false
@@ -279,10 +296,10 @@ let gen_list context l =
   let open L in
   let repr = C.gen_list_repr context l in
   iol [
-    ios "parse_"; ios (some_of l.ocaml_name); ios " x = ";
-      gen_cc "let count = next_count() in refer count (";
+    ios "parse_"; ios (some_of l.ocaml_name); ios " x ="; eol;
+      gen_cc "  let count = next_count() in refer count (\n";
         (* Piqirun.parse_(packed_)?(list|array|array32|array64) *)
-        ios "Piqirun.parse_"; repr;
+        ios "  Piqirun.parse_"; repr;
           ios " ("; gen_type context l.typename ~is_packed:l.protobuf_packed; ios ")";
 
           (* when parsing packed repeated fields, we should also accept
@@ -294,8 +311,8 @@ let gen_list context l =
           ]
           else iol [];
 
-          ios " x";
-      gen_cc ")";
+          ios " x"; eol;
+      gen_cc "  )\n";
   ]
 
 
@@ -313,21 +330,22 @@ let gen_typedefs context typedefs =
   then iol []
   else
     let defs = List.map (gen_typedef context) typedefs in
-    iod " " [
-      gen_cc "let next_count = Piqloc.next_icount";
-      gen_cc "let curr_count () = !Piqloc.icount";
+    iol [
+      gen_cc "let next_count = Piqloc.next_icount\n";
+      gen_cc "let curr_count () = !Piqloc.icount\n";
       (* NOTE: providing special handling for boxed objects, since they are not
        * references and can not be uniquely identified. Moreover they can mask
        * integers which are used for enumerating objects *)
       gen_cc "let refer ref obj =
         if not (Obj.is_int (Obj.repr obj))
         then Piqloc.addrefret ref obj
-        else obj";
+        else obj\n";
       gen_cc "let incr_count_if_true ((obj, _) as res) =
         if obj then ignore(next_count());
-        res";
-      ios "let rec"; iod " and " defs;
-      ios "\n";
+        res\n\n";
+
+      ios "let rec "; iod "and " (newlines (newlines defs));
+      eol
     ]
 
 

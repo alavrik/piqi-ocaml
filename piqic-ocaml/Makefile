@@ -38,7 +38,7 @@ clean::
 # recompile piqi self-spec into piqic_piqi.ml
 PIQI ?= piqi
 PIQIC = ./$(RESULT)
-PIQIC_FLAGS = -e piqi-ocaml --embed-piqi --pp #--trace
+PIQIC_FLAGS = -e piqi-ocaml --embed-piqi #--trace
 
 piqi:
 	$(PIQI) cc -o piqi.piqi

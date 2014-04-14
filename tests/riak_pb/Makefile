@@ -21,7 +21,7 @@ PACKS = piqirun.pb
 
 PIQI ?= piqi
 PIQIC = ../../piqic-ocaml/piqic-ocaml
-PIQIC_FLAGS = --pp #--keep-tmp-files
+#PIQIC_FLAGS =
 
 
 PRE_TARGETS = $(PIQI_FILES) $(PIQI_ML_FILES)

@@ -211,8 +211,9 @@ module Iolist =
     type iolist =
         Ios of string
       | Iol of iolist list
-      | Iob of char
+      | Ioc of char
       | Eol
+      | Indent of iolist
 
     (* iolist construction *)
     let (^^) a b =
@@ -224,25 +225,84 @@ module Iolist =
     let eol = Eol
     let ios x = Ios x
     let iol l = Iol l
-    let iob b = Iob b
+    let ioc c = Ioc c
+    let indent x = Indent x
 
-    let iod delim = function  (* iol with elements separated by delim *)
-      | [] -> Iol []
-      | h::t ->
-        let d = ios delim in
-        List.fold_left (fun accu x -> accu ^^ d ^^ x) h t
+    let iod delim l = (* iol with elements separated by delim *)
+      let insert_delim accu x =
+        match x with
+          | Iol [] -> accu
+          | _ -> accu ^^ (ios delim) ^^ x
+      in
+      match l with
+        | [] -> Iol []
+        | h::t ->
+            List.fold_left insert_delim h t
+
+    let ioi l = (* indented list *)
+      indent (iol l)
 
     let ioq x = (* double-quoted string *)
       iol [ios "\""; ios x; ios "\""]
 
+    let (|>) x f = f x
+
+    let newlines l =
+      let newline x =
+        match x with
+          | Indent _ -> x
+          | _ -> x ^^ Eol
+      in
+      List.map newline l
+
+    let prefix s l =
+      let prefix x =
+        ios s ^^ x
+      in
+      List.map prefix l
+
     (* iolist output *)
     let to_buffer0 buf l =
-      let rec aux = function
-        | Eol -> Buffer.add_char buf '\n';
-        | Ios s -> Buffer.add_string buf s
-        | Iol l -> List.iter aux l
-        | Iob b -> Buffer.add_char buf b
-      in aux l
+      let add_eol () =
+          Buffer.add_char buf '\n';
+      in
+      let add_indent level =
+        for i = 1 to level * 2
+        do
+          Buffer.add_char buf ' '
+        done
+      in
+      let rec aux level (newline, unindent) = function
+        | Eol ->
+            if not unindent  (* don't print another newline after unindent *)
+            then add_eol ();
+            (true, false)
+        | Ios s ->
+            if newline
+            then add_indent level;
+            Buffer.add_string buf s;
+            let newline =
+              if s = ""
+              then false
+              else (s.[String.length s - 1] = '\n')
+            in
+            (newline, false)
+        | Iol l ->
+            List.fold_left (fun accu x -> aux level accu x) (newline, unindent) l
+        | Ioc c ->
+            if newline
+            then add_indent level;
+            Buffer.add_char buf c;
+            (false, false)
+        | Indent x ->
+            if not newline  (* don't print a newline before indent *)
+            then add_eol ();
+            let newline, unindent = aux (level + 1) (true, unindent) x in
+            if not newline
+            then add_eol (); (* don't print another newline before unindent *)
+            (true, true)
+      in
+      ignore (aux 0 (true, false) l)
 
     let to_buffer l =
       let buf = Buffer.create 4096 in
@@ -914,5 +974,5 @@ let gen_list_repr context l =
 let gen_cc s =
   if !flag_cc
   then ios s
-  else ios ""
+  else iol []
 

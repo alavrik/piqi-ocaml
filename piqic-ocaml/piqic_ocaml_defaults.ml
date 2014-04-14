@@ -34,7 +34,7 @@ open Iolist
 let gen_type context typename =
   let import, parent_piqi, typedef = C.resolve_typename context typename in
   let parent_mod = C.gen_parent_mod import in
-  parent_mod ^^ ios "default_" ^^ ios (C.typedef_mlname typedef) ^^ ios "()"
+  iol [parent_mod; ios "default_"; ios (C.typedef_mlname typedef); ios " ()"]
 
 
 let gen_int piqi_type wire_type =
@@ -129,9 +129,9 @@ let gen_field_cons context rname f =
           let pb = some_of piqi_any.Any.protobuf in
           let default_str = String.escaped pb in
           let typename = some_of f.typename in
-          iod " " [
+          iol [
             Piqic_ocaml_in.gen_type context typename;
-              ios "(Piqirun.parse_default"; ioq default_str; ios ")";
+              ios " (Piqirun.parse_default "; ioq default_str; ios ")";
           ]
       | `optional, _ -> ios "None"
       | `repeated, _ ->
@@ -140,7 +140,7 @@ let gen_field_cons context rname f =
           else ios "[]"
   in
   (* field construction code *)
-  iod " " [ ffname; ios "="; value; ios ";" ]
+  iol [ffname; ios " = "; value; ios ";"]
 
 
 let gen_record context r =
@@ -158,9 +158,13 @@ let gen_record context r =
     then fconsl @ [iol [ios rname; ios ".piqi_unknown_pb = [];"]]
     else fconsl
   in (* fake_<record-name> function delcaration *)
-  iod " " [
-    ios "default_" ^^ ios (some_of r.R.ocaml_name); ios "() =";
-    ios "{"; iol fconsl; ios "}";
+  iol [
+    ios "default_"; ios (some_of r.R.ocaml_name); ios " () =";
+    ioi [
+      ios "{";
+      ioi (newlines fconsl);
+      ios "}";
+    ]
   ]
 
 
@@ -168,8 +172,8 @@ let gen_enum e =
   let open Enum in
   (* there must be at least one option *)
   let const = List.hd e.option in
-  iod " " [
-    ios "default_" ^^ ios (some_of e.ocaml_name); ios "() =";
+  iol [
+    ios "default_"; ios (some_of e.ocaml_name); ios " () = ";
       C.gen_pvar_name (some_of const.O.ocaml_name)
   ]
 
@@ -184,13 +188,13 @@ let gen_option context varname o =
         let import, parent_piqi, typedef = C.resolve_typename context typename in
         match o.ocaml_name, typedef with
           | None, `variant _ | None, `enum _ ->
-              iod " " [
-                ios "("; gen_type context typename; ios ":>"; ios varname; ios ")"
+              iol [
+                ios "("; gen_type context typename; ios " :> "; ios varname; ios ")"
               ]
           | _ ->
-              iod " " [
+              iol [
                 C.gen_pvar_name name;
-                ios "("; gen_type context typename; ios ")";
+                ios " ("; gen_type context typename; ios ")";
               ]
 
 
@@ -200,8 +204,8 @@ let gen_variant context v =
   let scoped_name = C.scoped_name context name in
   (* there must be at least one option *)
   let opt = gen_option context scoped_name (List.hd v.option) in
-  iod " " [
-    ios "default_" ^^ ios name; ios "() ="; opt;
+  iol [
+    ios "default_"; ios name; ios " () = "; opt;
   ]
 
 
@@ -209,16 +213,16 @@ let gen_alias context a =
   let open Alias in
   (* TODO: handle a new ocaml_default property the same way we do in
    * piqic-erlang *)
-  iod " " [
-    ios "default_" ^^ ios (some_of a.ocaml_name); ios "() =";
+  iol [
+    ios "default_"; ios (some_of a.ocaml_name); ios " () = ";
     C.gen_convert_value context a.ocaml_type "_of_" a.typename (gen_alias_type context a);
   ]
 
 
 let gen_list l =
   let open L in
-  iod " " [
-    ios "default_" ^^ ios (some_of l.ocaml_name); ios "() = ";
+  iol [
+    ios "default_"; ios (some_of l.ocaml_name); ios " () = ";
     if l.ocaml_array
     then ios "[||]"
     else ios "[]";
@@ -240,8 +244,8 @@ let gen_typedefs context typedefs =
   else 
     let defs = List.map (gen_typedef context) typedefs in
     iol [
-      ios "let rec "; iod " and " defs;
-      eol;
+      ios "let rec "; iod "and " (newlines defs);
+      eol; eol
     ]
 
 

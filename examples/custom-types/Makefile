@@ -24,7 +24,7 @@ PRE_TARGETS = $(PIQI_ML_FILES)
 
 
 PIQIC = ../../piqic-ocaml/piqic-ocaml
-PIQIC_FLAGS = --pp #--keep-tmp-files
+#PIQIC_FLAGS =
 
 
 all: native-code #byte-code debug-code

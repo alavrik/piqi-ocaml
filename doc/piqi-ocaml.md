@@ -70,8 +70,7 @@ to load and automatically include `<m>.ocaml.piqi`. This mechanism is called
 *Extension Modules*. It is described in detail in the Piqi language
 [section](/doc/piqi#extensionmodules).
 
-Output directory can be overridden using the `-C` command-line option. In
-addition, output `.ml` file can be pretty-printed using CamlP4 (`--pp` flag).
+Output directory can be overridden using the `-C` command-line option.
 
 Generated `<ocaml-module>.ml` file contains OCaml type definitions and functions
 for serializing and deserializing OCaml values.
@@ -218,12 +217,6 @@ For example:
     (unrecognized) Protobuf fields are captured during de-serialization in a
     special 'piqi_unknown_pb' field and automatically written back when the
     record is serialized to Protobuf.
-
--   `--pp` -- pretty-print output `.ml` files using CamlP4 (camlp4o).
-
--   `--keep-tmp-files` -- don't delete temporary files created during command
-    execution. This flag is helpful for debugging `piqic-ocaml` in case it
-    generates an invalid OCaml code.
 
 -   `--strict` treat unknown and duplicate fields as errors
 

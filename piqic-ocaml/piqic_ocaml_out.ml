@@ -121,7 +121,7 @@ let gen_record context r =
 
   (* field generator code *)
   let fgens_code = List.map
-    (fun (name, gen) -> iol [ ios "let "; esc name; ios " = "; gen; ios " in "])
+    (fun (name, gen) -> iol [ios "let "; esc name; ios " = "; gen; ios " in"; eol])
     fgens
   in
   let unknown_fields =
@@ -129,53 +129,63 @@ let gen_record context r =
     then [iol [ios "(Piqirun.gen_parsed_field_list "; ios "x."; ios rname; ios ".piqi_unknown_pb)"]]
     else [ios "[]"]
   in (* gen_<record-name> function delcaration *)
-  iod " " [
-    ios "gen__" ^^ ios (some_of r.R.ocaml_name); ios "code x =";
-      gen_cc "refer x;";
+  iol [
+    ios "gen__"; ios (some_of r.R.ocaml_name); ios " code x =";
+    ioi [
+      gen_cc "refer x;\n";
       iol fgens_code;
-      ios "Piqirun.gen_record code"; 
-      ios "(";
+      ios "Piqirun.gen_record code (";
         iod " :: " ((List.map esc fnames) @ unknown_fields);
       ios ")";
+    ]
   ]
 
 
 let gen_const c =
   let open Option in
-  iod " " [
-    ios "|"; C.gen_pvar_name (some_of c.ocaml_name); ios "->";
-      C.gen_code c.code ^^ ios "l"; (* ocaml int32 literal *)
+  iol [
+    ios "| "; C.gen_pvar_name (some_of c.ocaml_name); ios " -> ";
+      C.gen_code c.code; ios "l"; (* ocaml int32 literal *)
   ]
 
 
 let gen_enum_consts l =
   let consts = List.map gen_const l in
-  iol [ ios "(match x with "; iol consts; ios ")" ]
+  iol [
+    ios "(match x with";
+    ioi (newlines consts);
+    ios ")"
+  ]
 
 
 let gen_unpacked_enum e =
   let open Enum in
   iol [
-    ios "gen__"; ios (some_of e.ocaml_name); ios " code x = ";
-      gen_cc "refer x;";
+    ios "gen__"; ios (some_of e.ocaml_name); ios " code x =";
+    ioi [
+      gen_cc "refer x;\n";
       ios "Piqirun.int32_to_signed_varint code "; gen_enum_consts e.option;
+    ]
   ]
 
 
 let gen_packed_enum e =
   let open Enum in
   iol [
-    ios "packed_gen__"; ios (some_of e.ocaml_name); ios " x = ";
-      gen_cc "refer x;";
+    ios "packed_gen__"; ios (some_of e.ocaml_name); ios " x =";
+    ioi [
+      gen_cc "refer x;\n";
       ios "Piqirun.int32_to_packed_signed_varint "; gen_enum_consts e.option;
+    ]
   ]
 
 
 let gen_enum e =
   (* generate two functions: one for generating normal value; another one -- for
    * packed value *)
-  iod " and " [
-    gen_unpacked_enum e;
+  iol [
+    gen_unpacked_enum e; eol;
+    ios "and ";
     gen_packed_enum e;
   ]
 
@@ -186,10 +196,10 @@ let gen_option context o =
   let code = C.gen_code o.code in
   match o.typename with
     | None ->  (* this is a flag, i.e. option without a type *)
-        iod " " [
-          ios "|"; C.gen_pvar_name name; ios "->";
-          gen_cc "refer x;";
-          ios "Piqirun.gen_bool_field"; code; ios "true";
+        iol [
+          ios "| "; C.gen_pvar_name name; ios " -> ";
+          gen_cc "refer x; ";
+          ios "Piqirun.gen_bool_field "; code; ios " true";
         ]
     | Some typename ->
         let import, parent_piqi, typedef = C.resolve_typename context typename in
@@ -199,14 +209,14 @@ let gen_option context o =
                * and clauses to the top level -- in fact, relying on OCaml here
                * by using #<included variant or enum type> construct *)
               let scoped_typename = Piqic_ocaml_types.gen_typedef_type context typedef ?import in
-              iod " " [
-                ios "| (#" ^^ ios scoped_typename; ios " as x) ->";
-                  gen_type context typename; code; ios "x";
+              iol [
+                ios "| (#"; ios scoped_typename; ios " as x) -> ";
+                  gen_type context typename; ios " "; code; ios " x";
               ]
           | _ ->
-              iod " " [
-                ios "|"; C.gen_pvar_name name; ios "x ->";
-                  gen_type context typename; code; ios "x";
+              iol [
+                ios "| "; C.gen_pvar_name name; ios " x -> ";
+                  gen_type context typename; ios " "; code; ios " x";
               ]
 
 
@@ -215,9 +225,13 @@ let gen_variant context v =
   let options = List.map (gen_option context) v.option in
   let typename = Piqic_ocaml_types.gen_typedef_type context (`variant v) in
   iol [
-    ios "gen__"; ios (some_of v.ocaml_name); ios " code (x:"; ios typename; ios ") = ";
-    gen_cc "refer x; ";
-    ios "Piqirun.gen_record code [(match x with"; iol options; ios ")]";
+    ios "gen__"; ios (some_of v.ocaml_name); ios " code (x:"; ios typename; ios ") =";
+    ioi [
+      gen_cc "refer x;\n";
+      ios "Piqirun.gen_record code [(match x with";
+      ioi (newlines options);
+      ios ")]";
+    ]
   ]
 
 
@@ -247,8 +261,9 @@ let gen_alias context a =
     (* if a value can be packed, we need to generate two functions: one for
      * generating regular (unpacked) representation, and another one for
      * generating packed form *)
-    iod " and " [
-      gen_unpacked_alias context a;
+    iol [
+      gen_unpacked_alias context a; eol;
+      ios "and ";
       gen_packed_alias context a;
     ]
   else
@@ -283,8 +298,7 @@ let gen_typedef_1 x =
   let name = ios (C.typedef_mlname x) in
   iol [
     ios "let gen_"; name; ios " x = ";
-      ios"gen__"; name; ios " (-1) x";
-    ios "\n";
+      ios "gen__"; name; ios " (-1) x";
   ]
 
 
@@ -294,26 +308,26 @@ let gen_typedefs context typedefs =
   else
     let defs_2 = List.map (gen_typedef_2 context) typedefs in
     let defs_1 = List.map gen_typedef_1 typedefs in
-    iod " " [
-      gen_cc "let next_count = Piqloc.next_ocount";
+    iol [
+      gen_cc "let next_count = Piqloc.next_ocount\n";
       (* NOTE: providing special handling for boxed objects, since they are not
        * references and can not be uniquely identified. Moreover they can mask
        * integers which are used for enumerating objects *)
       gen_cc "let refer obj =
         let count = next_count () in
         if not (Obj.is_int (Obj.repr obj))
-        then Piqloc.addref obj count";
-      gen_cc "let reference f code x = refer x; f code x";
-      gen_cc "let reference1 f x = refer x; f x";
+        then Piqloc.addref obj count\n";
+      gen_cc "let reference f code x = refer x; f code x\n";
+      gen_cc "let reference1 f x = refer x; f x\n";
       gen_cc "let reference_if_true f code x =
         if x
         then reference f code x
-        else f code x";
+        else f code x\n\n";
 
-      ios "let rec"; iod " and " defs_2;
-      ios "\n\n";
-      iol defs_1;
-      ios "\n";
+      ios "let rec "; iod "and " (newlines (newlines defs_2));
+      eol;
+      iol (newlines defs_1);
+      eol; eol;
     ]
 
 

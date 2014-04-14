@@ -36,7 +36,7 @@ let flag_piqi_version = ref false
 
 let arg__pp =
   "--pp", Arg.Set flag_pp,
-    "pretty-print output using CamlP4 (camlp4o)"
+    "(DEPRECATED) pretty-print output using CamlP4 (camlp4o)"
 
 let arg__normalize_names =
   "--normalize-names", Arg.Bool (fun x -> C.flag_normalize_names := x),
@@ -118,7 +118,7 @@ let gen_embedded_piqi piqi_list =
   let piqi = List.hd (List.rev piqi_list) in
   let s = Piqirun.to_string (T.gen_piqi piqi) in
   iol [
-    ios "let piqi = "; ioq (String.escaped s)
+    ios "let piqi = "; ioq (String.escaped s); eol
   ]
 
 
@@ -140,7 +140,7 @@ let gen_piqi_ml context =
 
     (* NOTE: --multi-format serialization depends on --embded-piqi *)
     if !flag_embed_piqi || !flag_multi_format
-    then iol [ gen_embedded_piqi context.modules ]
+    then gen_embedded_piqi context.modules
     else iol [];
 
     ios "include "; ios modname; eol;
@@ -204,6 +204,7 @@ let speclist = Piqi_compile.getopt_speclist @
     arg__pp;
     arg__gen_defaults;
     arg__gen_preserve_unknown_fields;
+    (* TODO: deprecated and remove in the next major release (together with --pp) *)
     Piqi_command.arg__keep_tmp_files;
     arg__embed_piqi;
     arg__multi_format;
@@ -246,6 +247,16 @@ let run () =
 
   if !flag_gen_defaults
   then C.warning "--gen-defaults flag is deprecated: always generating defaults";
+
+  if !flag_pp
+  then C.warning "--pp flag is deprecated (generated code is now pretty-printed by default)";
+
+  (match Piqi_command.arg__keep_tmp_files with
+    | _, Arg.Set keep_tmp_files, _ ->
+        if !keep_tmp_files
+        then C.warning "--keep-tmp-files flag is deprecated (useless without deprecated --pp)";
+    | _ -> ()
+  );
 
   piqic_file !Piqi_command.ifile
 

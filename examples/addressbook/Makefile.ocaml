@@ -20,7 +20,7 @@ PACKS = piqirun.pb
 
 
 PIQIC = ../../piqic-ocaml/piqic-ocaml
-PIQIC_FLAGS = --pp #--keep-tmp-files
+#PIQIC_FLAGS =
 
 
 all: native-code #byte-code

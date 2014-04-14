@@ -27,7 +27,7 @@ PRE_TARGETS = $(PIQI_ML_FILES)
 
 
 PIQIC = ../../piqic-ocaml/piqic-ocaml
-PIQIC_FLAGS = --pp
+#PIQIC_FLAGS =
 
 
 export OCAMLPATH = ../..
