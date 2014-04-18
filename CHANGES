@@ -1,3 +1,15 @@
+Piqi-ocaml 0.7.1 (April 17, 2014)
+=================================
+
+Fixes:
+
+  - 'piqic-ocaml --normalize-names' should be true by default
+
+Other changes:
+
+  - piqic-ocaml: indent generated .ml code instead of relying on camlp4o
+
+
 Piqi-ocaml 0.7.0 (April 7, 2014)
 ================================
 
