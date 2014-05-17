@@ -42,6 +42,10 @@ let arg__normalize_names =
   "--normalize-names", Arg.Bool (fun x -> C.flag_normalize_names := x),
     "true|false turn CamlCase-style names into \"camel_case\" (default = true)"
 
+let arg__reserved_name =
+  "--reserved-name", Arg.String (fun x -> Hashtbl.add Piqic_common.ocaml_reserved x ()),
+    "add a reserved name in addition to the standard OCaml keywords"
+
 let arg__gen_defaults =
   "--gen-defaults", Arg.Set flag_gen_defaults,
     "(depreacted) always enabled: generate default value constructors for generated types"
@@ -201,6 +205,7 @@ let speclist = Piqi_compile.getopt_speclist @
   [
     Piqi_command.arg_C;
     arg__normalize_names;
+    arg__reserved_name;
     arg__pp;
     arg__gen_defaults;
     arg__gen_preserve_unknown_fields;

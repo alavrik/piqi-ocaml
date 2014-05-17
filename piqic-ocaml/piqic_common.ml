@@ -406,8 +406,22 @@ let flag_cc = ref false
 let flag_gen_preserve_unknown_fields = ref false
 
 
+let ocaml_reserved = Hashtbl.create 83
+let () = Array.iter (fun n -> Hashtbl.add ocaml_reserved n ())
+  [|"and";        "as";       "assert"; "asr";     "begin";   "class";
+    "constraint"; "do";       "done";   "downto";  "else";    "end";
+    "exception";  "external"; "false";  "for";     "fun";     "function";
+    "functor";    "if";       "in";     "include"; "inherit"; "initializer";
+    "land";       "lazy";     "let";    "lor";     "lsl";     "lsr";
+    "lxor";       "match";    "method"; "mod";     "module";  "mutable";
+    "new";        "object";   "of";     "open";    "or";      "private";
+    "rec";        "sig";      "struct"; "then";    "to";      "true";
+    "try";        "type";     "val";    "virtual"; "when";    "while";
+    "with"|]
+
 (* ocaml name of piqi name *)
 let ocaml_name n =
+  if Hashtbl.mem ocaml_reserved n then n ^ "_" else
   let n =
     if !flag_normalize_names
     then U.normalize_name n
