@@ -1,3 +1,12 @@
+Piqi-ocaml 0.7.2 (May 17, 2014)
+===============================
+
+New features:
+
+  - Automatically prefix OCaml keywords and user-specified reserved names with
+    underscores in generated OCaml code (thanks to Petter Urkedal)
+
+
 Piqi-ocaml 0.7.1 (April 17, 2014)
 =================================
 
