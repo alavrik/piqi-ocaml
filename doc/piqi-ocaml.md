@@ -203,6 +203,10 @@ For example:
     transformations, e.g. "CamelCase" turns into "camelCase". The default value
     is `true`.
 
+-   `--reserved-name` -- add a reserved name in addition to the standard OCaml
+    keywords. Can be used several times. Such names will be prefixed with
+    underscores in the generated OCaml code.
+
 -   `--runtime <module>` name of the Protobuf serialization runtime module
     (default = Piqirun)
 
