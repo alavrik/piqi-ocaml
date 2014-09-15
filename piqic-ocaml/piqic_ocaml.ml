@@ -48,7 +48,7 @@ let arg__reserved_name =
 
 let arg__gen_defaults =
   "--gen-defaults", Arg.Set flag_gen_defaults,
-    "(depreacted) always enabled: generate default value constructors for generated types"
+    "(DEPRECATED) always enabled: generate default value constructors for generated types"
 
 let arg__gen_preserve_unknown_fields =
   "--gen-preserve-unknown-fields", Arg.Set C.flag_gen_preserve_unknown_fields,
