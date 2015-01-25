@@ -11,4 +11,5 @@ remove: [
 depends: [
   "ocamlfind"
   "piqilib"
+  "base-bytes"
 ]
