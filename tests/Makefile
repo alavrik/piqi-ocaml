@@ -2,6 +2,7 @@ include ../make/Makefile.dirs
 
 
 DIRS = \
+       piqirun \
        addressbook \
        piqi \
        perf \

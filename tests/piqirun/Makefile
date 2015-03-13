@@ -6,7 +6,7 @@ RESULT = test
 SOURCES = test.ml
 
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = piqirun.pb
 
 
