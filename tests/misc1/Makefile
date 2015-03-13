@@ -8,7 +8,7 @@ SOURCES = id_piqi.ml id_piqi_ext.ml example_piqi.ml example_piqi_ext.ml test.ml
 PRE_TARGETS = id.proto.piqi example.proto.piqi id_piqi.ml id_piqi_ext.ml example_piqi.ml example_piqi_ext.ml
 
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = piqirun.ext
 
 

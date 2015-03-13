@@ -15,7 +15,7 @@ PIQI_FILES = $(PROTO_FILES:%=%.piqi)
 PIQI_ML_FILES = $(PROTO_FILES:%.proto=%_piqi.ml)
 
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = piqirun.pb
 
 

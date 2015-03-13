@@ -15,7 +15,7 @@ endif
 
 PRE_TARGETS = addressbook_piqi.ml
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = piqirun.pb
 
 

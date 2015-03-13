@@ -9,7 +9,7 @@ SOURCES = \
 	test.ml
 
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = unix piqirun.ext
 
 

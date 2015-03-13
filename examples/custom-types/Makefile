@@ -10,7 +10,7 @@ SOURCES = \
 	$(PIQI_ML_FILES2) \
 
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = piqirun.pb num
 
 

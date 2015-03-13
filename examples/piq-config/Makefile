@@ -9,7 +9,7 @@ SOURCES = \
 	config.ml
 
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = piqirun.ext
 
 

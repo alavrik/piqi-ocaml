@@ -30,7 +30,7 @@ PIQIC = ../../piqic-ocaml/piqic-ocaml
 #PIQIC_FLAGS =
 
 
-export OCAMLPATH = ../..
+export OCAMLPATH := ../..:$(OCAMLPATH)
 PACKS = piqirun.pb
 
 
