@@ -18,9 +18,6 @@ LIBINSTALL_FILES = \
 	piqirun.ml # TODO: piqirun.mli
 
 
-STATIC = 1  # build a static library (don't build dlls)
-
-
 PRE_TARGETS = META
 
 
