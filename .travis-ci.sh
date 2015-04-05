@@ -1,25 +1,27 @@
-#!/bin/sh
+#!/bin/bash
 
 set -ex
 
-
-# build dependencies
-sudo add-apt-repository --yes ppa:avsm/ocaml42+opam11
-sudo apt-get update -qq
-sudo apt-get install -y ocaml camlp4-extra opam
 
 # optional dependencies for running tests
 sudo apt-get install protobuf-compiler
 
 
-export OPAMYES=1
-rm -rf ~/.opam
+# build, run tests, build package, install package
+wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-opam.sh
 
-opam init
-opam remote add piqi git://github.com/piqi/piqi-opam-repo.git
-opam install piqilib
+. .travis-opam.sh
 
 
-eval `opam config env`
-make
-make -C tests
+# build and test using the current development version of piqilib
+if [ -n "${PIQILIB_DEV-}" ]
+then
+    opam repo add piqi git://github.com/piqi/piqi-opam-repo.git
+
+    opam install piqilib.master
+
+    make distclean
+    make
+    make test
+fi
+
