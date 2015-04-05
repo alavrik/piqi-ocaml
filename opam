@@ -8,6 +8,7 @@ remove: [
   ["rm" "-f" "%{prefix}%/bin/piqic-ocaml"]
   ["ocamlfind" "remove" "piqirun"]
 ]
+build-test: [make "test"]
 depends: [
   "ocamlfind"
   "piqilib"
