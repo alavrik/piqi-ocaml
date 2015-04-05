@@ -129,8 +129,7 @@ list](TODO) for ideas.
 
 Some useful commands:
 
-    make -C tests
-    make -C tests clean
+    make test
 
 
 License

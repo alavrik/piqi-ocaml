@@ -7,7 +7,7 @@ DESTDIR ?= /usr/local
 DIRS = piqirun piqic-ocaml
 
 
-.PHONY: install uninstall clean distclean
+.PHONY: install uninstall clean distclean test
 
 
 install:
@@ -21,4 +21,11 @@ uninstall:
 	rm -f $(DESTDIR)/bin/piqic-ocaml
 
 
-distclean: clean
+test:
+	$(MAKE) -C tests
+
+
+distclean:
+	$(MAKE) clean
+	$(MAKE) -C tests clean
+
