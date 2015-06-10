@@ -269,10 +269,17 @@ let gen_typedefs context (typedefs:T.typedef list) =
 let gen_import context import =
   let open Import in
   let index = C.resolve_import context import in
-  let piqi = index.i_piqi in
+  let imported_modname =
+    match import.ocaml_module with
+      | Some modname ->  (* local override *)
+          modname
+      | None ->  (* original modname *)
+          let piqi = index.i_piqi in
+          some_of piqi.P.ocaml_module
+  in
   iod " " [
     ios "module "; ios (some_of import.ocaml_name); ios "=";
-        ios (some_of piqi.P.ocaml_module);
+      ios imported_modname;
     eol; eol
   ]
 

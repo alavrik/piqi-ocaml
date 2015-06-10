@@ -37,7 +37,7 @@
 
 
 .extend [
-    .typedef piqi
+    (.typedef piqi import)
 
     .with.field [
         .name ocaml-module
