@@ -1,6 +1,7 @@
 OCAMLMAKEFILE := ../make/OCamlMakefile
 
-
+export ANNOTATE=yes
+export THREADS=yes
 RESULT = piqic-ocaml
 
 
@@ -18,7 +19,8 @@ SOURCES = \
 	piqic_ocaml.ml \
 
 
-PACKS = piqilib bytes
+PACKS = core core_kernel piqilib bytes
+export THREADS=yes
 INCDIRS = ../piqirun
 LIBS = ../piqirun/piqirun
 

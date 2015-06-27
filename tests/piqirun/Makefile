@@ -7,7 +7,8 @@ SOURCES = test.ml
 
 
 export OCAMLPATH := ../..:$(OCAMLPATH)
-PACKS = piqirun.pb
+PACKS = core core_kernel piqirun.pb
+export THREADS=yes
 
 
 all: bc

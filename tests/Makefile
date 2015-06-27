@@ -1,6 +1,7 @@
 include ../make/Makefile.dirs
 
 
+PACKS+=core core_kernel
 DIRS = \
        piqirun \
        addressbook \

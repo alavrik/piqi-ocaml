@@ -111,7 +111,7 @@ let gen_record_mod context r =
   let fields = r.R.field in
   let fdefs = (* field definition list *)
     if fields <> []
-    then List.map (gen_field context) fields
+    then Core.Std.List.map ~f:(gen_field context) fields
     else [ios "_dummy: unit;"]
   in
   let fdefs =
@@ -192,7 +192,7 @@ let gen_list context l =
 
 
 let gen_options context options =
-  let options_code = List.map (gen_option context) options in
+  let options_code = Core.Std.List.map ~f:(gen_option context) options in
   ioi [
     ios "[";
     ioi (prefix "| " options_code |> newlines);
@@ -285,7 +285,7 @@ let gen_import context import =
 
 
 let gen_imports context l =
-  let l = List.map (gen_import context) l in
+  let l = Core.Std.List.map ~f:(gen_import context) l in
   iol l
 
 

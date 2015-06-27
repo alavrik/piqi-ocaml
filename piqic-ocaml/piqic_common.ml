@@ -106,7 +106,7 @@ module Utils =
 
     (* list flatmap *)
     let flatmap f l =
-      List.concat (List.map f l)
+      List.concat (Core.Std.List.map ~f l)
 
 
     (* NOTE: naive, non-tail recursive. Remove duplicates from the list using
@@ -256,13 +256,13 @@ module Iolist =
           | Indent _ -> x
           | _ -> x ^^ Eol
       in
-      List.map newline l
+      Core.Std.List.map ~f:newline l
 
     let prefix s l =
       let prefix x =
         ios s ^^ x
       in
-      List.map prefix l
+      Core.Std.List.map ~f:prefix l
 
     (* iolist output *)
     let to_buffer0 buf l =
@@ -476,7 +476,7 @@ let mlname_record x =
   R.({
     x with
     ocaml_name = mlname x.ocaml_name x.name;
-    field = List.map mlname_field x.field;
+    field = Core.Std.List.map ~f:mlname_field x.field;
   })
 
 
@@ -488,7 +488,7 @@ let mlname_variant (x: T.variant) :T.variant =
   V.({
     x with
     ocaml_name = mlname x.ocaml_name x.name;
-    option = List.map mlname_option x.option;
+    option = Core.Std.List.map ~f:mlname_option x.option;
   })
 
 
@@ -496,7 +496,7 @@ let mlname_enum x =
   E.({
     x with
     ocaml_name = mlname x.ocaml_name x.name;
-    option = List.map mlname_option x.option;
+    option = Core.Std.List.map ~f:mlname_option x.option;
   })
 
 
@@ -547,9 +547,9 @@ let mlname_piqi (piqi:T.piqi) =
   {
     piqi with
     ocaml_module = ocaml_module;
-    typedef = List.map mlname_typedef piqi.typedef;
-    func = List.map mlname_func piqi.func;
-    import = List.map mlname_import piqi.import;
+    typedef = Core.Std.List.map ~f:mlname_typedef piqi.typedef;
+    func = Core.Std.List.map ~f:mlname_func piqi.func;
+    import = Core.Std.List.map ~f:mlname_import piqi.import;
   }
 
 
@@ -627,7 +627,7 @@ let make_idtable l =
 
 (* index typedefs by name *)
 let index_typedefs l =
-  make_idtable (List.map (fun x -> typedef_name x, x) l)
+  make_idtable (Core.Std.List.map ~f:(fun x -> typedef_name x, x) l)
 
 
 let make_import_name x =
@@ -638,7 +638,7 @@ let make_import_name x =
 
 (* index imports by name *)
 let index_imports l =
-  make_idtable (List.map (fun x -> make_import_name x, x) l)
+  make_idtable (Core.Std.List.map ~f:(fun x -> make_import_name x, x) l)
 
 
 (* generate an index of all imports and definitions of a given module *)
@@ -652,7 +652,7 @@ let index_module piqi =
 
 (* make an index of module name -> index *)
 let make_module_index piqi_list =
-  make_idtable (List.map (fun x -> some_of x.P.modname, index_module x) piqi_list)
+  make_idtable (Core.Std.List.map ~f:(fun x -> some_of x.P.modname, index_module x) piqi_list)
 
 
 let option_to_list = function
@@ -684,7 +684,7 @@ let rec get_used_builtin_typedefs typedefs builtins_index =
   else
     let typenames = U.uniq (U.flatmap get_used_typenames typedefs) in
     let builtin_typenames = List.filter (Idtable.mem builtins_index) typenames in
-    let builtin_typedefs = List.map (Idtable.find builtins_index) builtin_typenames in
+    let builtin_typedefs = Core.Std.List.map ~f:(Idtable.find builtins_index) builtin_typenames in
     (* get built-in types' dependencies (that are also built-in types) -- usually
      * no more than 2-3 recursion steps is needed *)
     let res = (get_used_builtin_typedefs builtin_typedefs builtins_index) @ builtin_typedefs in
@@ -695,7 +695,7 @@ let rec get_used_builtin_typedefs typedefs builtins_index =
  * module *)
 let add_builtin_typedefs piqi builtins_index =
   (* exclude builtin typedefs that are masked by the local typedefs *)
-  let typedef_names = List.map typedef_name piqi.P.typedef in
+  let typedef_names = Core.Std.List.map ~f:typedef_name piqi.P.typedef in
   let builtins_index = List.fold_left Idtable.remove builtins_index typedef_names in
   let used_builtin_typedefs = get_used_builtin_typedefs piqi.P.typedef builtins_index in
   (* change the module as if the built-ins were defined locally *)
@@ -706,7 +706,7 @@ let add_builtin_typedefs piqi builtins_index =
 
 
 let init piqi_list =
-  let named_piqi_list = List.map mlname_piqi piqi_list in
+  let named_piqi_list = Core.Std.List.map ~f:mlname_piqi piqi_list in
 
   (* the module being compiled is the last element of the list; preceding
    * modules are imported dependencies *)
@@ -733,7 +733,7 @@ let init piqi_list =
   in
   let builtins_index = index_typedefs builtin_typedefs in
   let piqi = add_builtin_typedefs piqi builtins_index in
-  let imports = List.map (fun x -> add_builtin_typedefs x builtins_index) imports in
+  let imports = Core.Std.List.map ~f:(fun x -> add_builtin_typedefs x builtins_index) imports in
 
   (* index the compiled module's contents *)
   let index = index_module piqi in

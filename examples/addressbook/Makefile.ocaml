@@ -16,7 +16,8 @@ endif
 PRE_TARGETS = addressbook_piqi.ml
 
 export OCAMLPATH := ../..:$(OCAMLPATH)
-PACKS = piqirun.pb
+PACKS = core core_kernel piqirun.pb
+export THREADS=yes
 
 
 PIQIC = ../../piqic-ocaml/piqic-ocaml

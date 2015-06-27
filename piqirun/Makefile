@@ -5,7 +5,9 @@ RESULT = piqirun
 
 
 # piqirun_ext.ml depends on it
-PACKS = piqilib bytes
+PACKS = core core_kernel piqilib bytes 
+export THREADS=yes
+export ANNOTATE=yes
 
 
 SOURCES = \

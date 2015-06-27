@@ -9,7 +9,8 @@ PRE_TARGETS = id.proto.piqi example.proto.piqi id_piqi.ml id_piqi_ext.ml example
 
 
 export OCAMLPATH := ../..:$(OCAMLPATH)
-PACKS = piqirun.ext
+PACKS = core core_kernel piqirun.ext
+export THREADS=yes
 
 
 PIQI ?= piqi

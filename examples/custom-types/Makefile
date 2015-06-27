@@ -11,7 +11,8 @@ SOURCES = \
 
 
 export OCAMLPATH := ../..:$(OCAMLPATH)
-PACKS = piqirun.pb num
+PACKS = core core_kernel piqirun.pb num
+export THREADS=yes
 
 
 PIQI_FILES = example.piqi skvl.piqi

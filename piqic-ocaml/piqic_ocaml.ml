@@ -179,6 +179,7 @@ let piqic context =
 (* this is the same as calling "piqi compile ..." and reading its output but,
  * instead, we are just using the library functions *)
 let piqi_compile_piqi ifile =
+  let open Core.Std.String in
   let self_spec_bin = T.piqi in
   (* by adding "ocaml" extension, we tell the library to automatically load
    * *.ocaml.piqi extension modules *)

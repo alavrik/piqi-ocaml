@@ -20,7 +20,6 @@
  * "piqic-ocaml --multi-format" Piqi compiler
  *)
 
-
 type input_format = [ `piq | `json | `xml | `pb | `pib ]
 
 type output_format = [ input_format | `json_pretty | `xml_pretty ]
