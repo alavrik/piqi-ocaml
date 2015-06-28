@@ -45,9 +45,94 @@ module L = T.Piqi_list
 module P = T.Piqi
 
 
-(* utils *)
-module Utils =
+(* util *)
+module Util =
   struct
+    (* the below alternative tail-recursive implementation of stdlib's List.append
+     * was copied from Core (https://github.com/janestreet/core_kernel)
+     *)
+
+    let list_slow_append l1 l2 = List.rev_append (List.rev l1) l2
+
+
+    let rec list_count_append l1 l2 count =
+      match l2 with
+      | [] -> l1
+      | _ ->
+        match l1 with
+        | []               ->                         l2
+        | [x1]             -> x1                   :: l2
+        | [x1; x2]         -> x1 :: x2             :: l2
+        | [x1; x2; x3]     -> x1 :: x2 :: x3       :: l2
+        | [x1; x2; x3; x4] -> x1 :: x2 :: x3 :: x4 :: l2
+        | x1 :: x2 :: x3 :: x4 :: x5 :: tl ->
+          x1 :: x2 :: x3 :: x4 :: x5 ::
+            (if count > 1000
+             then list_slow_append tl l2
+             else list_count_append tl l2 (count + 1))
+
+    let list_append l1 l2 = list_count_append l1 l2 0
+
+
+    module Std =
+      struct
+        module List =
+          struct
+            include List
+
+            let map = Piqirun.list_map
+
+            let append = list_append
+
+            let concat l =
+              let rec aux accu = function
+                | [] -> rev accu
+                | h::t -> aux (rev_append h accu) t
+              in
+              aux [] l
+
+            let flatten = concat
+
+            let fold_right f l accu =
+              fold_left (fun a b -> f b a) accu (rev l)
+
+            let split l =
+              let rec aux accu_a accu_b = function
+                | [] ->
+                    rev accu_a, rev accu_b
+                | (a,b)::t ->
+                    aux (a::accu_a) (b::accu_b) t
+              in
+              aux [] [] l
+
+            let combine l1 l2 =
+              let rec aux accu l1 l2 =
+                match l1, l2 with
+                  | [], [] -> rev accu
+                  | (h1::t1), (h2::t2) ->
+                      aux ((h1, h2)::accu) t1 t2
+                  | (_, _) ->
+                      invalid_arg "List.combine"
+              in
+              aux [] l1 l2
+          end
+
+        let ( @ ) = List.append
+      end
+
+
+    open Std
+
+
+    (* list flatmap *)
+    let flatmap f l =
+      let rec aux accu = function
+        | [] -> List.rev accu
+        | h::t -> aux (List.rev_append (f h) accu) t
+      in
+      aux [] l
+
+
     (* substitute character [x] with [y] in string [s] *)
     let string_subst_char s x y =
       if not (String.contains s x)
@@ -102,11 +187,6 @@ module Utils =
         aux 0
       with _ ->
         false
-
-
-    (* list flatmap *)
-    let flatmap f l =
-      List.concat (List.map f l)
 
 
     (* NOTE: naive, non-tail recursive. Remove duplicates from the list using
@@ -205,7 +285,12 @@ module Utils =
       else string_of_list (normalize_list (list_of_string s))
   end
 
-module U = Utils
+module U = Util
+
+(* NOTE: Std can be opened explicitly as U.Std or C.Std or included implicitly
+ * by opening Piqic_common *)
+module Std = U.Std
+include Std
 
 
 (* a datastructure for output construction *)
