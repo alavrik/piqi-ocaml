@@ -112,7 +112,7 @@ let gen_record context r =
   (* order fields by are by their integer codes *)
   let fields = List.sort (fun a b -> compare a.F.code b.F.code) r.R.field in
   let fgens = (* field generators list *)
-    List.map (gen_field context rname) fields
+    Core.Std.List.map ~f:(gen_field context rname) fields
   in
   (* field names *)
   let fnames, _ = List.split fgens in
@@ -120,8 +120,8 @@ let gen_record context r =
   let esc x = ios "_" ^^ ios x in
 
   (* field generator code *)
-  let fgens_code = List.map
-    (fun (name, gen) -> iol [ios "let "; esc name; ios " = "; gen; ios " in"; eol])
+  let fgens_code = Core.Std.List.map
+    ~f:(fun (name, gen) -> iol [ios "let "; esc name; ios " = "; gen; ios " in"; eol])
     fgens
   in
   let unknown_fields =
@@ -135,7 +135,7 @@ let gen_record context r =
       gen_cc "refer x;\n";
       iol fgens_code;
       ios "Piqirun.gen_record code (";
-        iod " :: " ((List.map esc fnames) @ unknown_fields);
+        iod " :: " ((Core.Std.List.map ~f:esc fnames) @ unknown_fields);
       ios ")";
     ]
   ]
@@ -150,7 +150,7 @@ let gen_const c =
 
 
 let gen_enum_consts l =
-  let consts = List.map gen_const l in
+  let consts = Core.Std.List.map ~f:gen_const l in
   iol [
     ios "(match x with";
     ioi (newlines consts);
@@ -222,7 +222,7 @@ let gen_option context o =
 
 let gen_variant context v =
   let open Variant in
-  let options = List.map (gen_option context) v.option in
+  let options = Core.Std.List.map ~f:(gen_option context) v.option in
   let typename = Piqic_ocaml_types.gen_typedef_type context (`variant v) in
   iol [
     ios "gen__"; ios (some_of v.ocaml_name); ios " code (x:"; ios typename; ios ") =";
@@ -306,8 +306,8 @@ let gen_typedefs context typedefs =
   if typedefs = []
   then iol []
   else
-    let defs_2 = List.map (gen_typedef_2 context) typedefs in
-    let defs_1 = List.map gen_typedef_1 typedefs in
+    let defs_2 = Core.Std.List.map ~f:(gen_typedef_2 context) typedefs in
+    let defs_1 = Core.Std.List.map ~f:gen_typedef_1 typedefs in
     iol [
       gen_cc "let next_count = Piqloc.next_ocount\n";
       (* NOTE: providing special handling for boxed objects, since they are not

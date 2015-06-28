@@ -10,7 +10,8 @@ SOURCES = \
 
 
 export OCAMLPATH := ../..:$(OCAMLPATH)
-PACKS = piqirun.ext
+PACKS = core core_kernel piqirun.ext
+export THREADS=yes
 
 
 PIQI_FILES = addressbook.proto.piqi

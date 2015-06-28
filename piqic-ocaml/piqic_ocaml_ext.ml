@@ -112,7 +112,7 @@ let gen_import context import =
 
 
 let gen_imports context l =
-  let l = List.map (gen_import context) l in
+  let l = Core.Std.List.map ~f:(gen_import context) l in
   iol l
 
 
@@ -126,10 +126,10 @@ let gen_piqi context =
    * for built-in types to work *)
   let typedefs = List.filter (fun x -> not (C.is_builtin_typedef x)) typedefs in
 
-  let type_initializers = List.map (gen_init_piqi_type context) typedefs in
-  let parsers = List.map (gen_parse modname) typedefs in
-  let generators = List.map (gen_gen modname) typedefs in
-  let printers = List.map gen_print typedefs in
+  let type_initializers = Core.Std.List.map ~f:(gen_init_piqi_type context) typedefs in
+  let parsers = Core.Std.List.map ~f:(gen_parse modname) typedefs in
+  let generators = Core.Std.List.map ~f:(gen_gen modname) typedefs in
+  let printers = Core.Std.List.map ~f:gen_print typedefs in
 
   iol [
     gen_imports context piqi.P.import;

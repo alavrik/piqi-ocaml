@@ -1,6 +1,8 @@
 .PHONY: all ocaml test clean
 
 
+PACKS=core core_kernel
+export THREADS=yes
 PIQI ?= piqi
 
 

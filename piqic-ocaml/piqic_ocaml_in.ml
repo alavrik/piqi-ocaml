@@ -140,7 +140,7 @@ let gen_record context r =
   let fields = List.sort (fun a b -> compare a.F.code b.F.code) r.R.field in
   let fconsl = (* field constructor list *)
     if fields <> []
-    then List.map (gen_field_cons context rname) fields
+    then Core.Std.List.map ~f:(gen_field_cons context rname) fields
     else [ios rname; ios "._dummy = ();"]
   in
   let fconsl =
@@ -149,7 +149,7 @@ let gen_record context r =
     else fconsl
   in
   let fparserl = (* field parsers list *)
-    List.map (gen_field_parser context) fields
+    Core.Std.List.map ~f:(gen_field_parser context) fields
   in
   let rcons = (* record constructor *)
     iol [
@@ -179,7 +179,7 @@ let gen_const c =
 
 let gen_enum e ~is_packed =
   let open Enum in
-  let consts = List.map gen_const e.option in
+  let consts = Core.Std.List.map ~f:gen_const e.option in
   let packed_prefix = C.gen_packed_prefix is_packed in
   iol [
     packed_prefix; ios "parse_"; ios (some_of e.ocaml_name); ios " x =";
@@ -246,7 +246,7 @@ let gen_variant context v =
   let open Variant in
   let name = some_of v.ocaml_name in
   let scoped_name = C.scoped_name context name in
-  let options = List.map (gen_option context scoped_name) v.option in
+  let options = Core.Std.List.map ~f:(gen_option context scoped_name) v.option in
   iol [
     ios "parse_"; ios name; ios " x =";
     ioi [
@@ -329,7 +329,7 @@ let gen_typedefs context typedefs =
   if typedefs = []
   then iol []
   else
-    let defs = List.map (gen_typedef context) typedefs in
+    let defs = Core.Std.List.map ~f:(gen_typedef context) typedefs in
     iol [
       gen_cc "let next_count = Piqloc.next_icount\n";
       gen_cc "let curr_count () = !Piqloc.icount\n";

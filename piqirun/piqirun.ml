@@ -823,7 +823,7 @@ let parse_optional_field code parse_value ?default l =
 
 let parse_repeated_field code parse_value l =
   let res, rem = find_fields code l in
-  List.map parse_value res, rem
+  Core.Std.List.map ~f:parse_value res, rem
 
 
 (* similar to List.map but store results in a newly created output array *)
@@ -943,7 +943,7 @@ let parse_list_elem parse_value (code, x) =
 
 let parse_list parse_value obj =
   let l = parse_record obj in
-  List.map (parse_list_elem parse_value) l
+  Core.Std.List.map ~f:(parse_list_elem parse_value) l
 
 
 let parse_array parse_value obj =
@@ -1364,7 +1364,7 @@ let gen_parsed_field (code, value) =
 
 
 let gen_parsed_field_list l =
-  List.map gen_parsed_field l
+  Core.Std.List.map ~f:gen_parsed_field l
 
 
 (*
@@ -1442,7 +1442,7 @@ let gen_optional_field code f = function
 
 
 let gen_repeated_field code f l =
-  iol (List.map (f code) l)
+  iol (Core.Std.List.map ~f:(f code) l)
 
 
 (* similar to Array.map but produces list instead of array *)
@@ -1474,7 +1474,7 @@ let gen_packed_repeated_field_common code contents =
 
 
 let gen_packed_repeated_field code f l =
-  let contents = iol_size (List.map f l) in
+  let contents = iol_size (Core.Std.List.map ~f l) in
   gen_packed_repeated_field_common code contents
 
 
@@ -1518,7 +1518,7 @@ let gen_record code contents =
 (* generate binary representation of <type>_list .proto structure *)
 let gen_list f code l =
   (* NOTE: using "1" as list element code *)
-  let contents = List.map (f 1) l in
+  let contents = Core.Std.List.map ~f:(f 1) l in
   gen_record code contents
 
 

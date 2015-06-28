@@ -16,7 +16,8 @@ PIQI_ML_FILES = $(PROTO_FILES:%.proto=%_piqi.ml)
 
 
 export OCAMLPATH := ../..:$(OCAMLPATH)
-PACKS = piqirun.pb
+PACKS = core core_kernel piqirun.pb
+export THREADS=yes
 
 
 PIQI ?= piqi

@@ -1,6 +1,7 @@
 .PHONY: all ocaml test ocaml_ext test_ext clean
 
 
+PACKS=+core core_kernel
 all: ocaml test ocaml_ext test_ext
 
 
