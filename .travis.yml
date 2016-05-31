@@ -4,5 +4,7 @@ env:
   - PACKAGE="piqi" OCAML_VERSION=3.12
   - PACKAGE="piqi" OCAML_VERSION=4.00
   - PACKAGE="piqi" OCAML_VERSION=4.01
-  - PACKAGE="piqi" OCAML_VERSION=4.02 PIQILIB_DEV=1
-  - PACKAGE="piqi" OCAML_VERSION=latest
+  - PACKAGE="piqi" OCAML_VERSION=4.02
+  - PACKAGE="piqi" OCAML_VERSION=4.03
+  # development version of piqilib
+  - PACKAGE="piqi" OCAML_VERSION=4.03 PINS=piqilib
