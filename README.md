@@ -69,8 +69,12 @@ following command:
 This command will install the latest stable version of Piqi that includes `piqi`
 and `piqic-ocaml` executables and runtime libraries for OCaml.
 
-To install the latest development version of Piqi, follow the instructions at
-https://github.com/piqi/piqi-opam-repo
+To install the latest development version of Piqi, use opam pinning.
+
+    opam pin add --dev-repo piqi
+
+    # when pinning piqi, you may also want to pin piqilib, which piqi depends on
+    opam pin add --dev-repo piqilib
 
 
 ### Installing from source code
