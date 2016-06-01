@@ -1,3 +1,10 @@
+Piqi-ocaml 0.7.5 (May 31, 2016)
+===============================
+
+- Switch to tail-recursive List.map in the piqirun.ml runtime library
+- (new feature) Support for overriding ocaml name of an imported module
+
+
 Piqi-ocaml 0.7.4 (Mar 13, 2015)
 ===============================
 
