@@ -287,6 +287,22 @@ is mapped to:
 
     module Fum = Bar
 
+It is possible to override ocaml names of an imported module by using
+`.ocaml-name` and `.ocaml-module` properties in the import statement. For
+example, given an import statement like this:
+
+    .import [
+        .module m
+        .ocaml-module "Foo.Bar"
+        .ocaml-name "Fum"
+    ]
+
+`piqic-ocaml` will generate the following statement at the top of the generated
+`_piqi.ml`:
+
+    module Fum = Foo.Bar
+
+
 ### Primitive types
 
 The table below represents correspondence between Piqi primitive types and OCaml
