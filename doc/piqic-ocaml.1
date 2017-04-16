@@ -1,0 +1,46 @@
+.TH PIQIC-OCAML 1 "piqic\-ocaml User Manual"
+.SH NAME
+.PP
+piqic\-ocaml - the Piqi compiler for OCaml
+.SH SYNOPSIS
+.PP
+piqic\-ocaml [\f[I]options\f[]] [\f[I]filename\f[]]
+.SH DESCRIPTION
+.PP
+.SS General Options
+.TP
+.B \f[C]\-\-version\f[]
+Print piqic\-ocaml version and exit
+.TP
+.B \f[C]\-\-piqi\-version\f[]
+Print piqi version and exit
+.SS Codegen Options
+.TP
+.B \f[C]\-\-normalize\-name [ true | false ]\f[]
+Turn CamlCase-style names into \(lqcamel_case\(rq (default = true)
+.TP
+.B \f[C]\-\-reserved\-name <reserved-name>\f[]
+Add a reserved name in addition to the standard OCaml keywords
+.TP
+.B \f[C]\-\-gen\-preserve\-unknown\-fields\f[]
+Generate code that preserve unknown Protobuf fields when they are serialized back
+.TP
+.B \f[C]\-\-embed\-piqi\f[]
+Embed Piqi modules encoded in binary format in the generated code
+.TP
+.B \f[C]\-\-multi\-format\f[], \f[C]\-\-ext\f[]
+Generate extended OCaml stubs for multi-format (JSON/XML/Piq/Pb) serialization
+.TP
+.B \f[C]\-\-runtime <module>\f[]
+Name of the Protobuf serialization runtime module (default = Piqirun)
+.SS Deprecated Options
+These options are still present, but are deprecated.
+.TP
+.B \f[C]\-\-pp\f[]
+Pretty-print output using CamlP4 (camlp4o)
+.TP
+.B \f[C]\-\-gen\-defaults\f[]
+Generate default value constructors for generated types
+.RS
+.PP
+This is no longer a real option, as it is always enabled
