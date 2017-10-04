@@ -31,10 +31,7 @@ open C
 open Iolist
 
 
-let gen_type context typename =
-  let import, parent_piqi, typedef = C.resolve_typename context typename in
-  let parent_mod = C.gen_parent_mod import in
-  iol [parent_mod; ios "default_"; ios (C.typedef_mlname typedef); ios " ()"]
+let gen_type context typename = Piqic_ocaml_in.gen_default_type context typename
 
 
 let gen_int piqi_type wire_type =
@@ -115,30 +112,13 @@ let rec gen_alias_type ?wire_type context a =
               gen_type context typename
 
 
-let gen_field_cons context rname f =
+let gen_field_default_cons context rname f =
   let open Field in
   let fname = C.mlname_of_field context f in
   let ffname = (* fully-qualified field name *)
     iol [ios rname; ios "."; ios fname]
-  in 
-  let value =
-    match f.mode, f.default with
-      | `required, _ -> gen_type context (some_of f.typename)
-      | `optional, _ when f.typename = None -> ios "false" (* flag *)
-      | `optional, Some piqi_any when not f.ocaml_optional ->
-          let pb = some_of piqi_any.Any.protobuf in
-          let default_str = String.escaped pb in
-          let typename = some_of f.typename in
-          iol [
-            Piqic_ocaml_in.gen_type context typename;
-              ios " (Piqirun.parse_default "; ioq default_str; ios ")";
-          ]
-      | `optional, _ -> ios "None"
-      | `repeated, _ ->
-          if f.ocaml_array
-          then ios "[||]"
-          else ios "[]"
   in
+  let value = Piqic_ocaml_in.gen_field_default_value context f in
   (* field construction code *)
   iol [ffname; ios " = "; value; ios ";"]
 
@@ -150,7 +130,7 @@ let gen_record context r =
   let fields = List.sort (fun a b -> compare a.F.code b.F.code) r.R.field in
   let fconsl = (* field constructor list *)
     if fields <> []
-    then List.map (gen_field_cons context rname) fields
+    then List.map (gen_field_default_cons context rname) fields
     else [ios rname; ios "._dummy = ();"]
   in
   let fconsl =

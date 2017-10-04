@@ -87,30 +87,25 @@ let gen_field context rname f =
   in 
   let code = C.gen_code f.code in
   let mode = C.gen_field_mode context f in
-  let fgen =
-    match f.typename with
-      | Some typename ->
-          (* field generation code *)
-          iod " " [ 
-            ios "Piqirun.gen_" ^^ ios mode ^^ ios "_field";
-              code;
-              gen_type context typename ~is_packed:f.protobuf_packed;
-              ffname
-          ]
-      | None ->
-          (* flag generation code *)
-          iod " " [
-            gen_cc "reference_if_true ";
-            ios "Piqirun.gen_flag"; code; ffname;
-          ]
+  let typename = some_of f.typename in
+  (* field generation code *)
+  let fgen = iod " " [
+      ios "Piqirun.gen_" ^^ ios mode ^^ ios "_field";
+        code;
+        gen_type context typename ~is_packed:f.protobuf_packed;
+        ffname
+  ]
   in (fname, fgen)
 
 
 let gen_record context r =
   (* fully-qualified capitalized record name *)
   let rname = String.capitalize (some_of r.R.ocaml_name) in
+  (* skip fields marked as .internal *)
+  let fields = r.R.field in
+  let fields = List.filter (fun x -> not x.F.internal) fields in
   (* order fields by are by their integer codes *)
-  let fields = List.sort (fun a b -> compare a.F.code b.F.code) r.R.field in
+  let fields = List.sort (fun a b -> compare a.F.code b.F.code) fields in
   let fgens = (* field generators list *)
     List.map (gen_field context rname) fields
   in
@@ -319,10 +314,6 @@ let gen_typedefs context typedefs =
         then Piqloc.addref obj count\n";
       gen_cc "let reference f code x = refer x; f code x\n";
       gen_cc "let reference1 f x = refer x; f x\n";
-      gen_cc "let reference_if_true f code x =
-        if x
-        then reference f code x
-        else f code x\n\n";
 
       ios "let rec "; iod "and " (newlines (newlines defs_2));
       eol;

@@ -86,12 +86,40 @@ let gen_default = function
 let esc x = ios "_" ^^ ios x
 
 
+let gen_default_type context typename =
+  let import, parent_piqi, typedef = C.resolve_typename context typename in
+  let parent_mod = C.gen_parent_mod import in
+  iol [parent_mod; ios "default_"; ios (C.typedef_mlname typedef); ios " ()"]
+
+
+let gen_field_default_value context f =
+  let open Field in
+  let typename = some_of f.typename in
+  match f.mode, f.default with
+    | `required, _ ->
+        gen_default_type context typename
+    | `optional, Some piqi_any when not f.ocaml_optional ->
+        let pb = some_of piqi_any.Any.protobuf in
+        let default_str = String.escaped pb in
+        iol [
+          gen_cc "(Piqloc.pause (); let res = ";
+          gen_type context typename;
+            ios " (Piqirun.parse_default "; ioq default_str; ios ")";
+          gen_cc " in Piqloc.resume (); res)";
+        ]
+    | `optional, _ -> ios "None"
+    | `repeated, _ ->
+        if f.ocaml_array
+        then ios "[||]"
+        else ios "[]"
+
+
 let gen_field_cons context rname f =
   let open Field in
   let fname = C.mlname_of_field context f in
   let ffname = (* fully-qualified field name *)
     iol [ios rname; ios "."; ios fname]
-  in 
+  in
   (* field construction code *)
   iol [ ffname; ios " = "; esc fname; ios ";" ]
 
@@ -101,36 +129,33 @@ let gen_field_parser context f =
   let fname = C.mlname_of_field context f in
   let mode = C.gen_field_mode context f in
   let code = C.gen_code f.code in
-  let fcons =
-  match f.typename with
-    | Some typename ->
-        (* field constructor *)
-        iod " " [
-          (* "parse_(required|optional|repeated)_field" function invocation *)
-          ios "Piqirun.parse_" ^^ ios mode ^^ ios "_field";
-            code;
-            gen_type context typename ~is_packed:f.protobuf_packed;
+  let typename = some_of f.typename in
+  if not f.internal
+  then
+    let fcons =
+      (* field constructor *)
+      iod " " [
+        (* "parse_(required|optional|repeated)_field" function invocation *)
+        ios "Piqirun.parse_" ^^ ios mode ^^ ios "_field";
+          code;
+          gen_type context typename ~is_packed:f.protobuf_packed;
 
-            (* when parsing packed repeated fields, we should also accept
-             * fields in unpacked representation; therefore, specifying an
-             * unpacked field parser as another parameter *)
-            if f.protobuf_packed
-            then gen_type context typename
-            else iol [];
+          (* when parsing packed repeated fields, we should also accept
+           * fields in unpacked representation; therefore, specifying an
+           * unpacked field parser as another parameter *)
+          if f.protobuf_packed
+          then gen_type context typename
+          else iol [];
 
-            ios "x";
-            gen_default f.default;
-        ]
-    | None ->
-        (* flag constructor *)
-        iod " " [ 
-          gen_cc "incr_count_if_true (";
-            ios "Piqirun.parse_flag"; code; ios "x";
-          gen_cc ")";
-        ]
-  in
-  (* field parsing code *)
-  iol [ ios "let "; esc fname; ios ", x = "; fcons; ios " in"; eol ]
+          ios "x";
+          gen_default f.default;
+      ]
+    in
+    (* field parsing code *)
+    iol [ ios "let "; esc fname; ios ", x = "; fcons; ios " in"; eol ]
+  else
+    let fcons = gen_field_default_value context f in
+    iol [ ios "let "; esc fname; ios " = "; fcons; ios " in"; eol ]
 
 
 let gen_record context r =
@@ -340,9 +365,6 @@ let gen_typedefs context typedefs =
         if not (Obj.is_int (Obj.repr obj))
         then Piqloc.addrefret ref obj
         else obj\n";
-      gen_cc "let incr_count_if_true ((obj, _) as res) =
-        if obj then ignore(next_count());
-        res\n\n";
 
       ios "let rec "; iod "and " (newlines (newlines defs));
       eol
