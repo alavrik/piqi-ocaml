@@ -18,6 +18,6 @@ available: [ ocaml-version >= "4.02.0" ]
 depends: [
   "ocamlfind"
   "piqilib"
-  "num" {build-test}
+  "num" {test}
 ]
 dev-repo: "git://github.com/alavrik/piqi-ocaml"
