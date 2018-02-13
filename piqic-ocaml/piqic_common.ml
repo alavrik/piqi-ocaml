@@ -139,7 +139,7 @@ module Util =
       then s
       else
         (* preserve the original string *)
-        let s = Bytes.copy s in
+        let s = Bytes.of_string s in
         for i = 0 to (Bytes.length s) - 1
         do
           if Bytes.get s i = x
