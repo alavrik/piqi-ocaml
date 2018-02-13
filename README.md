@@ -61,7 +61,7 @@ Installation
 
 ### Installing using OPAM
 
-In order to install Piqi using [OPAM](http://opam.ocamlpro.com/), run the
+In order to install Piqi using [OPAM](https://opam.ocaml.org/), run the
 following command:
 
     opam install piqi

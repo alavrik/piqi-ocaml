@@ -19,19 +19,10 @@ let nativeint_to_int: nativeint -> int = Nativeint.to_int
 (* mapping OCaml big_int to Piqi string (by representing number as a decimal
  * string)
  *)
-(*
-(* Used to work with OCaml < 4.06 -- commenting out for now; XXX: support num |
- * base-num as test dependency *)
 type bigint = Big_int.big_int
 
 let bigint_of_string: string -> bigint = Big_int.big_int_of_string
 let bigint_to_string: bigint -> string = Big_int.string_of_big_int
-*)
-type bigint = string
-
-let bigint_of_string (x: string) :bigint = x
-let bigint_to_string (x: bigint) :string = x
-
 
 
 (*
