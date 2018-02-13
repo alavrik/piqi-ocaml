@@ -2,10 +2,10 @@
 let read_file filename =
   let ch = open_in_bin filename in
   let size = in_channel_length ch in
-  let res = String.create size in
+  let res = Bytes.create size in
   really_input ch res 0 size;
   close_in ch;
-  res
+  Bytes.unsafe_to_string res
 
 
 let string_of_format = function
