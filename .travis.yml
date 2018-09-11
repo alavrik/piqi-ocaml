@@ -8,4 +8,4 @@ env:
   - PACKAGE="piqi" OCAML_VERSION=4.04 PINS=piqilib
   - PACKAGE="piqi" OCAML_VERSION=4.05 PINS=piqilib
   - PACKAGE="piqi" OCAML_VERSION=4.06 PINS=piqilib
-  - PACKAGE="piqi" OCAML_VERSION=4.06 PINS=piqilib
+  - PACKAGE="piqi" OCAML_VERSION=4.07 PINS=piqilib
