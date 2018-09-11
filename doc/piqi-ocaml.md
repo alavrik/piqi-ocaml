@@ -411,13 +411,13 @@ OCaml types to Piqi types.
     will be set to the default value during deserialization. Also, see
     [Limitations](#limitations) section below.
 
-    **optional** Piqi fields without type (i.e. *flags*) are mapped to `bool`
-    OCaml fields. The value of the field will be set to `true` if the flag is
-    present in the record.
-
     **repeated** Piqi fields of type `<t>` are mapped to fields with type
     `<t> list`. It is possible to use OCaml `array` instead of `list` by
     specifying an additional `.ocaml-array` property in the field definition.
+
+    It is possible for some fields to generate OCaml definitions but exclude
+    them during serialization/deserialization. This is achieved by adding
+    `.internal` flag under `.field [ ... ]`.
 
 -   Enums and Variants are mapped directly to OCaml polymorphic variants.
 
