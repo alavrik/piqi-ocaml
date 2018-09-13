@@ -71,10 +71,9 @@ and `piqic-ocaml` executables and runtime libraries for OCaml.
 
 To install the latest development version of Piqi, use opam pinning.
 
-    opam pin add --dev-repo piqi
-
-    # when pinning piqi, you may also want to pin piqilib, which piqi depends on
-    opam pin add --dev-repo piqilib
+    opam pin add -n --dev-repo piqilib
+    opam pin add -n --dev-repo piqi
+    opam install piqi
 
 
 ### Installing from source code
