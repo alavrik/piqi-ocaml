@@ -18,7 +18,7 @@ SOURCES = \
 	piqic_ocaml.ml \
 
 
-PACKS = piqilib bytes
+PACKS = piqilib bytes stdlib-shims
 INCDIRS = ../piqirun
 LIBS = ../piqirun/piqirun
 

@@ -5,7 +5,7 @@ RESULT = piqirun
 
 
 # piqirun_ext.ml depends on it
-PACKS = piqilib
+PACKS = piqilib stdlib-shims
 
 
 SOURCES = \
