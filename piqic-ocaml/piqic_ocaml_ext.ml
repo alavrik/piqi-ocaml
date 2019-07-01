@@ -88,10 +88,10 @@ let gen_print typedef =
   let name = C.typedef_mlname typedef in
   iol [
     ios "let print_"; ios name; ios " ?opts x ="; eol;
-    ios "  Pervasives.print_endline (gen_"; ios name; ios " x `piq ?opts)";
+    ios "  Stdlib.print_endline (gen_"; ios name; ios " x `piq ?opts)";
     eol;
     ios "let prerr_"; ios name; ios " ?opts x ="; eol;
-    ios "  Pervasives.prerr_endline (gen_"; ios name; ios " x `piq ?opts)";
+    ios "  Stdlib.prerr_endline (gen_"; ios name; ios " x `piq ?opts)";
     eol;
   ]
 

@@ -203,7 +203,7 @@ module IBuf =
         | Channel x ->
             let start_pos = pos_in x in
             let s = Bytes.create length in
-            (try Pervasives.really_input x s 0 length
+            (try Stdlib.really_input x s 0 length
              with End_of_file -> raise End_of_buffer
             );
             of_string (Bytes.unsafe_to_string s) start_pos

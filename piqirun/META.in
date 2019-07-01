@@ -4,7 +4,7 @@ package "pb" (
   description = "Piqi runtime library for Protocol Buffers serialization"
   archive(byte) = "piqirun.cmo"
   archive(native) = "piqirun.cmx"
-  requires = "bytes"
+  requires = "bytes stdlib-shims"
 )
 
 package "ext" (
