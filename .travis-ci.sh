@@ -4,7 +4,7 @@ set -ex
 
 
 # optional dependencies for running tests
-sudo apt-get install protobuf-compiler
+sudo apt-get install protobuf
 
 
 # build, run tests, build package, install package

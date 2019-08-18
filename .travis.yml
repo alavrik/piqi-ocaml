@@ -3,9 +3,9 @@ script: "./.travis-ci.sh"
 env:
   # NOTE: testing only against the current development version of piqilib,
   # because compatibility is not guaranteed with previous releases
-  - PACKAGE="piqi" OCAML_VERSION=4.02 PINS=piqilib
   - PACKAGE="piqi" OCAML_VERSION=4.03 PINS=piqilib
   - PACKAGE="piqi" OCAML_VERSION=4.04 PINS=piqilib
   - PACKAGE="piqi" OCAML_VERSION=4.05 PINS=piqilib
   - PACKAGE="piqi" OCAML_VERSION=4.06 PINS=piqilib
   - PACKAGE="piqi" OCAML_VERSION=4.07 PINS=piqilib
+  - PACKAGE="piqi" OCAML_VERSION=4.08 PINS=piqilib
