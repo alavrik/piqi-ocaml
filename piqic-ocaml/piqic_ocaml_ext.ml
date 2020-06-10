@@ -29,7 +29,7 @@ let gen_init_piqi modname =
   iol [
     ios "let piqi = "; ios modname; ios ".piqi"; eol;
     eol; eol;
-    ios "let _ = Piqirun_ext.init_piqi piqi"; eol;
+    ios "let () = Piqirun_ext.init_piqi piqi"; eol;
   ]
 
 
