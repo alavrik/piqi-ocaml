@@ -1,6 +1,7 @@
 (executable
  (name piqic_ocaml)
  (public_name piqic-ocaml)
+ (package piqi)
  (libraries piqilib piqirun bytes stdlib-shims))
 
 (rule
