@@ -29,5 +29,5 @@ build: [
 ]
 
 install: [
-  ["dune" "install"]
+  ["dune" "install" "-p" "piqi,piqirun"]
 ]
