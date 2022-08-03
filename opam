@@ -6,7 +6,7 @@ homepage: "https://github.com/alavrik/piqi-ocaml"
 bug-reports: "https://github.com/alavrik/piqi-ocaml/issues"
 depends: [
   "ocaml" {>= "4.02.0"}
-  "ocamlfind" {build}
+  "dune" {>= "2.0.0"}
   "piqilib"
   "stdlib-shims"
   "num" {with-test}
@@ -24,6 +24,10 @@ build: [
     jobs
     "@install"
     "@runtest" {with-test}
-  "@doc" {with-doc}
+    "@doc" {with-doc}
   ]
+]
+
+install: [
+  ["dune" "install"]
 ]
