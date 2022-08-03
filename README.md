@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/alavrik/piqi-ocaml.png)](https://travis-ci.org/alavrik/piqi-ocaml)
+[![build](https://github.com/alavrik/piqi-ocaml/actions/workflows/build.yml/badge.svg)](https://github.com/alavrik/piqi-ocaml/actions/workflows/build.yml)
 
 
 Piqi is a multi-format data serialization system for OCaml. It provides a
