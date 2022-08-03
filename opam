@@ -19,7 +19,7 @@ build: [
     "dune"
     "build"
     "-p"
-    "piqic_ocaml,piqirun"
+    "piqi,piqirun"
     "-j"
     jobs
     "@install"
@@ -29,5 +29,5 @@ build: [
 ]
 
 install: [
-  ["dune" "install" "-p" "piqic_ocaml,piqirun"]
+  ["dune" "install" "-p" "piqi,piqirun"]
 ]
